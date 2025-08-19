@@ -13,10 +13,9 @@ public interface Storage {
 
     /**
      * Initializes the storage backend. This can include creating tables if they don't exist.
-     *
-     * @return A CompletableFuture that completes when initialization is done.
+     * This method is expected to be called synchronously on startup.
      */
-    CompletableFuture<Void> initialize();
+    void initialize();
 
     /**
      * Closes any connections and cleans up resources used by the storage backend.

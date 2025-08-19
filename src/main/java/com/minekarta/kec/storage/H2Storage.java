@@ -66,15 +66,14 @@ public class H2Storage implements Storage {
     }
 
     @Override
-    public CompletableFuture<Void> initialize() {
-        return runAsync(() -> {
-            try (Connection conn = dbManager.getDataSource().getConnection();
-                 PreparedStatement ps = conn.prepareStatement(CREATE_ACCOUNTS_TABLE)) {
-                ps.execute();
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to initialize H2 database", e);
-            }
-        });
+    public void initialize() {
+        // This must run synchronously on startup to ensure tables are ready.
+        try (Connection conn = dbManager.getDataSource().getConnection();
+             PreparedStatement ps = conn.prepareStatement(CREATE_ACCOUNTS_TABLE)) {
+            ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to initialize H2 database", e);
+        }
     }
 
     @Override
