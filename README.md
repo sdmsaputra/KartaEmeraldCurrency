@@ -4,7 +4,7 @@ KartaEmeraldCurrency is a modern, high-performance economy plugin for PaperMC se
 
 Built to be efficient and safe, all database operations are handled asynchronously to prevent server lag.
 
-**Compatibility:** PaperMC 1.19.4 – 1.21.8 (Java 17+)
+**Compatibility:** PaperMC 1.21 – 1.21.8 (Java 21+)
 
 ## Features
 
@@ -47,18 +47,19 @@ All admin commands require the base permission `kec.admin` or granular permissio
 | `/kecadmin give <player> <amount>` | `kec.admin.give` | Gives a player physical emeralds. |
 | `/kecadmin take <player> <amount>` | `kec.admin.take` | Takes physical emeralds from a player. |
 | `/kecadmin reload` | `kec.admin.reload` | Reloads the configuration files. |
+| `/kecadmin migrate <source_type>` | `kec.admin.migrate` | Migrates data from one storage type to another (e.g., SQLITE to MYSQL). |
 
 ## Placeholders
 
 Requires [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.624/).
 
-- `%kartaemerald_balance%` - Player's balance (source configurable: BANK or TOTAL).
-- `%kartaemerald_balance_formatted%` - Player's balance formatted (e.g., 1.2k).
-- `%kartaemerald_balance_comma%` - Player's balance with commas (e.g., 1,234,567).
-- `%kartaemerald_bank%` - Player's bank balance.
-- `%kartaemerald_wallet%` - Player's physical emerald count in inventory.
-- `%kartaemerald_top_<1-10>_name%` - Name of the Nth player on the leaderboard.
-- `%kartaemerald_top_<1-10>_amount%` - Balance of the Nth player on the leaderboard.
+- `%kartaemerald_balance%` - Player's total bank balance.
+- `%kartaemerald_balance_formatted%` - Player's bank balance, formatted with suffixes (e.g., 1.2k).
+- `%kartaemerald_balance_comma%` - Player's bank balance, formatted with commas (e.g., 1,234,567).
+- `%kartaemerald_bank%` - An alias for `%kartaemerald_balance%`.
+- `%kartaemerald_wallet%` - Player's physical emerald count in their inventory.
+- `%kartaemerald_top_<1-10>_name%` - **(Not yet implemented)** Name of the Nth player on the leaderboard.
+- `%kartaemerald_top_<1-10>_amount%` - **(Not yet implemented)** Balance of the Nth player on the leaderboard.
 
 ## Developer API
 

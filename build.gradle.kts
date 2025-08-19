@@ -7,14 +7,14 @@ file("gradle.properties").inputStream().use { properties.load(it) }
 
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.0"
 }
 
 group = properties.getProperty("pluginGroupId")
 version = properties.getProperty("pluginVersion")
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     withJavadocJar()
     withSourcesJar()
 }
@@ -29,7 +29,7 @@ repositories {
 dependencies {
     // Compile-Only Dependencies (provided by server or other plugins)
     compileOnly("io.papermc.paper:paper-api:${properties.getProperty("paperApiVersion")}")
-    compileOnly("com.github.MilkBowl:VaultAPI:${properties.getProperty("vaultApiVersion")}")
+    compileOnly("com.github.milkbowl:VaultAPI:${properties.getProperty("vaultApiVersion")}")
     compileOnly("me.clip:placeholderapi:${properties.getProperty("placeholderApiVersion")}")
     compileOnly("mysql:mysql-connector-java:8.0.33") // For compiling against, not for bundling
 
@@ -44,6 +44,7 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll(listOf("-Xlint:all,-serial", "-parameters"))
+        options.release.set(21)
     }
 
     // Configure the shadowJar task

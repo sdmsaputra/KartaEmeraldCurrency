@@ -1,7 +1,7 @@
 name: KartaEmeraldCurrency
 main: com.minekarta.kec.KartaEmeraldCurrencyPlugin
 version: ${version}
-api-version: '1.19'
+api-version: '1.21'
 authors: [MinekartaStudio]
 description: An emerald-based economy plugin with a virtual bank, GUI, and API.
 softdepend: [Vault, PlaceholderAPI]
