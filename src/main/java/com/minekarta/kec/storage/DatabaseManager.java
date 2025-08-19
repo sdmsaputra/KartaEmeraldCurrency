@@ -32,7 +32,6 @@ public class DatabaseManager {
                     dbFile.getParentFile().mkdirs();
                 }
                 config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
-                config.setDriverClassName("org.sqlite.JDBC");
                 break;
 
             case MYSQL:
