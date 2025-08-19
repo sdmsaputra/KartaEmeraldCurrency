@@ -2,6 +2,7 @@ package com.minekarta.kec.storage;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,6 +11,22 @@ import java.util.concurrent.CompletableFuture;
  * All operations are asynchronous and return a {@link CompletableFuture}.
  */
 public interface Storage {
+    /**
+     * Retrieves a sorted list of top balances.
+     *
+     * @param limit The maximum number of results to return.
+     * @param offset The starting offset for the results (for pagination).
+     * @return A CompletableFuture that resolves to a map of Player UUIDs to their balances, sorted descending.
+     */
+    CompletableFuture<Map<UUID, Long>> getTopBalances(int limit, int offset);
+
+    /**
+     * Gets the total number of player accounts in the database.
+     *
+     * @return A CompletableFuture that resolves to the total account count.
+     */
+    CompletableFuture<Integer> getAccountCount();
+
 
     /**
      * Initializes the storage backend. This can include creating tables if they don't exist.

@@ -125,4 +125,21 @@ public interface KartaEmeraldService {
      */
     @NotNull
     CurrencyFormatter getFormatter();
+
+    /**
+     * Gets a paginated list of the top bank balances on the server.
+     * The map is sorted by balance in descending order.
+     *
+     * @param limit The number of entries per page.
+     * @param offset The starting point in the database.
+     * @return A CompletableFuture that resolves to a map of player UUIDs to their balances.
+     */
+    CompletableFuture<java.util.Map<java.util.UUID, Long>> getTopBalances(int limit, int offset);
+
+    /**
+     * Gets the total number of accounts in the database.
+     *
+     * @return A CompletableFuture that resolves to the total number of accounts.
+     */
+    CompletableFuture<Integer> getAccountCount();
 }

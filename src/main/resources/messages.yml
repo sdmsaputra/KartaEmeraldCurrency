@@ -48,6 +48,15 @@ top-footer: "<gray>------------------------------------</gray>"
 top-empty: "<yellow>The leaderboard is currently empty.</yellow>"
 top-invalid-page: "<red>Invalid page number.</red>"
 
+# Chat Input
+chat-input-recipient-prompt: "<green>Please enter the recipient's name in chat, or type 'cancel' to abort.</green>"
+chat-input-amount-prompt: "<green>Please enter the amount to send to <white>{player}</white>, or type 'cancel' to abort.</green>"
+chat-input-deposit-prompt: "<green>Please enter the amount to deposit, or type 'cancel' to abort.</green>"
+chat-input-withdraw-prompt: "<green>Please enter the amount to withdraw, or type 'cancel' to abort.</green>"
+chat-input-cancelled: "<red>Transaction cancelled.</red>"
+chat-input-invalid-number: "<red>'{input}' is not a valid number.</red>"
+chat-input-must-be-positive: "<red>The amount must be a positive number.</red>"
+
 # Admin commands
 balance-set: "<green>Set <white>{player}'s</white> bank balance to <gold>{amount}</gold>.</green>"
 balance-add: "<green>Added <gold>{amount}</gold> to <white>{player}'s</white> bank balance.</green>"

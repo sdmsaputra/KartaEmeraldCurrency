@@ -58,6 +58,9 @@ main-menu:
 bank-menu:
   title: "<dark_green>Bank Account</dark_green>"
   size: 54 # 6 rows
+  fill-item:
+    material: BLUE_STAINED_GLASS_PANE
+    name: " "
   items:
     balance-info:
       slot: 4
