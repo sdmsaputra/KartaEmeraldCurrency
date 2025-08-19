@@ -10,7 +10,9 @@ Built to be efficient and safe, all database operations are handled asynchronous
 
 - **Emerald-Based Economy:** Uses physical Emeralds for deposits and withdrawals.
 - **Virtual Bank:** Securely store your emeralds in a virtual bank account, safe from inventory loss.
-- **Interactive GUIs:** A modern and easy-to-use GUI for all common actions (`/emerald`).
+- **Interactive GUI:** A modern and easy-to-use GUI for all common actions, accessible via `/emerald`.
+  - **Main Menu:** Shows a summary of your account balance.
+  - **Bank GUI:** A dedicated interface for depositing and withdrawing emeralds. You can deposit all emeralds from your inventory with one click, or deposit/withdraw a custom amount by entering the value in chat.
 - **Vault Integration:** Can act as the primary economy provider for any Vault-compatible plugin.
 - **PlaceholderAPI Support:** A full set of placeholders to display economic data on scoreboards, chat, etc.
 - **Developer API:** A clean, asynchronous API for other plugins to interact with the economy.
@@ -26,6 +28,8 @@ Built to be efficient and safe, all database operations are handled asynchronous
 ## Commands & Permissions
 
 ### User Commands (`/emerald` or `/kec`)
+The primary way to interact with the economy is through the main GUI (`/emerald`). While some direct commands may exist, the GUI provides access to all features, including the Bank, Transfers, and Leaderboards.
+
 | Command | Permission | Description |
 |---|---|---|
 | `/emerald` | `kec.gui` | Opens the main interactive GUI. |
