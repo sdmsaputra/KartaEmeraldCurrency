@@ -1,0 +1,87 @@
+name: KartaEmeraldCurrency
+main: com.minekarta.kec.KartaEmeraldCurrencyPlugin
+version: ${version}
+api-version: '1.19'
+authors: [MinekartaStudio]
+description: An emerald-based economy plugin with a virtual bank, GUI, and API.
+softdepend: [Vault, PlaceholderAPI]
+
+commands:
+  emerald:
+    description: Main command for KartaEmeraldCurrency.
+    aliases: [kec]
+    usage: "/<command> [help]"
+  emeraldadmin:
+    description: Admin commands for KartaEmeraldCurrency.
+    aliases: [kecadmin]
+    usage: "/<command> [help]"
+    permission: kec.admin
+
+permissions:
+  kec.admin:
+    description: Grants access to all admin commands.
+    default: op
+    children:
+      kec.admin.set: true
+      kec.admin.add: true
+      kec.admin.remove: true
+      kec.admin.reset: true
+      kec.admin.give: true
+      kec.admin.take: true
+      kec.admin.reload: true
+      kec.admin.migrate: true
+  kec.admin.set:
+    description: Allows setting a player's bank balance.
+    default: op
+  kec.admin.add:
+    description: Allows adding to a player's bank balance.
+    default: op
+  kec.admin.remove:
+    description: Allows removing from a player's bank balance.
+    default: op
+  kec.admin.reset:
+    description: Allows resetting a player's account.
+    default: op
+  kec.admin.give:
+    description: Allows giving physical emeralds to a player.
+    default: op
+  kec.admin.take:
+    description: Allows taking physical emeralds from a player.
+    default: op
+  kec.admin.reload:
+    description: Allows reloading the plugin's configuration.
+    default: op
+  kec.admin.migrate:
+    description: Allows migrating database storage.
+    default: op
+
+  kec.use:
+    description: Grants basic access to the currency system.
+    default: true
+    children:
+      kec.balance: true
+      kec.help: true
+  kec.balance:
+    description: Allows checking one's own balance.
+    default: true
+  kec.help:
+    description: Allows viewing the help menu.
+    default: true
+  kec.pay:
+    description: Allows paying other players.
+    default: true
+  kec.deposit:
+    description: Allows depositing emeralds into the bank.
+    default: true
+  kec.withdraw:
+    description: Allows withdrawing emeralds from the bank.
+    default: true
+  kec.bank:
+    description: Allows access to the bank GUI.
+    default: true
+  kec.top:
+    description: Allows viewing the leaderboard.
+    default: true
+  kec.gui:
+    description: Allows opening the main GUI.
+    default: true

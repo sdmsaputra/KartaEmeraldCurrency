@@ -1,0 +1,74 @@
+# KartaEmeraldCurrency - General Configuration
+# For help, visit [link-to-docs]
+
+currency:
+  # The material to be used as physical currency. Must be a valid item material.
+  material: EMERALD
+  # The block equivalent for denomination conversion.
+  block-material: EMERALD_BLOCK
+  # How many single units the block material is worth.
+  block-value: 9
+  # If true, allows fractional balances (e.g., 10.50). If false, all balances are integers.
+  # Note: Withdrawing to physical items will always round down.
+  allow-decimals: false
+  # The bank balance a new player starts with.
+  starting-bank-balance: 0
+  # The maximum balance a player can have in the bank. -1 for unlimited.
+  max-bank-balance: -1
+  # If true, allows a player's bank balance to go into the negative.
+  allow-negative: false
+
+vault:
+  # If true, KartaEmeraldCurrency will attempt to hook into Vault to become the server's economy provider.
+  enabled: true
+  # The source for Vault's getBalance() calls.
+  # BANK: Only the virtual bank balance.
+  # TOTAL: Bank balance + physical emeralds in inventory. (May cause slight performance impact on frequent checks)
+  economy-source: BANK
+
+placeholders:
+  # The default source for the main %kartaemerald_balance% placeholder.
+  # BANK: Only the virtual bank balance.
+  # TOTAL: Bank balance + physical emeralds in inventory.
+  source: BANK
+  # If true, formats large numbers into a compact form (e.g., 1.2k, 3.4M).
+  # If false, uses full numbers with commas.
+  compact: false
+
+fees:
+  transfer:
+    # A flat fee deducted from the sender for every `/pay` transaction.
+    flat: 0
+    # A percentage fee deducted from the sender for every `/pay` transaction.
+    # Example: 1.5 means a 1.5% fee.
+    percent: 0.0
+
+leaderboard:
+  # The balance source for the top players list.
+  # BANK: Only the virtual bank balance.
+  # TOTAL: Bank balance + physical emeralds in inventory.
+  source: BANK
+  # How many players to show on the leaderboard.
+  top-size: 10
+  # How often (in seconds) the leaderboard cache is updated from the database.
+  refresh-seconds: 60
+
+gui:
+  # Titles for the various GUI menus. Supports MiniMessage format.
+  titles:
+    main: "<green>Karta Emerald</green>"
+    bank: "<green>Bank</green>"
+    pay: "<green>Transfer</green>"
+    top: "<green>Leaderboard</green>"
+  # Quick amount buttons for deposit/withdraw menus.
+  quick-amounts: [1, 16, 64, 128, 256]
+
+safety:
+  # If true, players must confirm transactions that are larger than the threshold below.
+  require-confirmation-on-large-withdraw: true
+  # The amount at which a withdrawal is considered "large" and requires confirmation.
+  large-withdraw-threshold: 512
+
+logging:
+  # If true, prints detailed debug information to the console.
+  verbose: false
