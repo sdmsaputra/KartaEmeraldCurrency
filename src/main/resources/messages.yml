@@ -1,14 +1,14 @@
 # KartaEmeraldCurrency - Message Configuration
 # All messages support MiniMessage format: https://docs.advntr.dev/minimessage/format.html
-# Placeholders like {player}, {amount}, {balance} will be replaced automatically.
+# Placeholders like <player>, <amount>, <balance> will be replaced automatically.
 
 prefix: "<dark_gray>[<green>KEC</green>]<reset> "
 
 # General command & permission messages
 no-permission: "<red>You do not have permission to use this command.</red>"
-player-not-found: "<red>Player '{player}' not found or is not online.</red>"
+player-not-found: "<red>Player '<player>' not found or is not online.</red>"
 console-not-supported: "<red>This command cannot be run from the console.</red>"
-invalid-usage: "<red>Invalid usage. Use: {usage}</red>"
+invalid-usage: "<red>Invalid usage. Use: <usage></red>"
 
 # Economy-related messages
 invalid-amount: "<red>The amount specified is not a valid number.</red>"
@@ -22,41 +22,50 @@ cannot-pay-self: "<red>You cannot pay yourself.</red>"
 # Balance command
 balance:
   header: "<gray>--- <green>Balance</green> ---</gray>"
-  bank: "<white>Bank: <gold>{balance_bank}</gold></white>"
-  wallet: "<white>Wallet: <gold>{balance_wallet}</gold> (Physical)</white>"
-  total: "<white>Total: <green>{balance_total}</green></white>"
+  bank: "<white>Bank: <gold><balance_bank></gold></white>"
+  wallet: "<white>Wallet: <gold><balance_wallet></gold> (Physical)</white>"
+  total: "<white>Total: <green><balance_total></green></white>"
   footer: "<gray>-----------------</gray>"
 
 # Deposit command
-deposit-success: "<green>Successfully deposited <gold>{amount}</gold> emerald(s) into your bank.</green>"
-deposit-all-success: "<green>Successfully deposited all <gold>{amount}</gold> emerald(s) from your inventory.</green>"
+deposit-success: "<green>Successfully deposited <gold><amount></gold> emerald(s) into your bank.</green>"
+deposit-all-success: "<green>Successfully deposited all <gold><amount></gold> emerald(s) from your inventory.</green>"
 deposit-fail-no-items: "<yellow>You don't have any emeralds to deposit.</yellow>"
 
 # Withdraw command
-withdraw-success: "<green>Successfully withdrew <gold>{amount}</gold> emerald(s) from your bank.</green>"
+withdraw-success: "<green>Successfully withdrew <gold><amount></gold> emerald(s) from your bank.</green>"
 withdraw-fail-limit: "<red>Cannot withdraw. This would exceed the maximum physical stack limit.</red>"
 
 # Pay/Transfer command
-pay-success-sender: "<green>You sent <gold>{amount}</gold> emerald(s) to <white>{target}</white>.</green>"
-pay-received-notification: "<green><white>{sender}</white> has sent you <gold>{amount}</gold> emerald(s).</green>"
-fee-charged: "<gray>(A fee of <red>{fee}</red> was applied)</gray>"
+pay-success-sender: "<green>You sent <gold><amount></gold> emerald(s) to <white><target></white>.</green>"
+pay-received-notification: "<green><white><sender></white> has sent you <gold><amount></gold> emerald(s).</green>"
+fee-charged: "<gray>(A fee of <red><fee></red> was applied)</gray>"
 
 # Leaderboard (top command)
-top-header: "<gray>--- <green>Top {limit} Richest Players</green> (Page {page}/{max_page}) ---</gray>"
-top-entry: "<white>#{rank}. {player}: <gold>{balance}</gold></white>"
+top-header: "<gray>--- <green>Top <limit> Richest Players</green> (Page <page>/<max_page>) ---</gray>"
+top-entry: "<white>#<rank>. <player>: <gold><balance></gold></white>"
 top-footer: "<gray>------------------------------------</gray>"
 top-empty: "<yellow>The leaderboard is currently empty.</yellow>"
 top-invalid-page: "<red>Invalid page number.</red>"
 
+# Chat Input
+chat-input-recipient-prompt: "<green>Please enter the recipient's name in chat, or type 'cancel' to abort.</green>"
+chat-input-amount-prompt: "<green>Please enter the amount to send to <white><player></white>, or type 'cancel' to abort.</green>"
+chat-input-deposit-prompt: "<green>Please enter the amount to deposit, or type 'cancel' to abort.</green>"
+chat-input-withdraw-prompt: "<green>Please enter the amount to withdraw, or type 'cancel' to abort.</green>"
+chat-input-cancelled: "<red>Transaction cancelled.</red>"
+chat-input-invalid-number: "<red>'<input>' is not a valid number.</red>"
+chat-input-must-be-positive: "<red>The amount must be a positive number.</red>"
+
 # Admin commands
-balance-set: "<green>Set <white>{player}'s</white> bank balance to <gold>{amount}</gold>.</green>"
-balance-add: "<green>Added <gold>{amount}</gold> to <white>{player}'s</white> bank balance.</green>"
-balance-remove: "<green>Removed <gold>{amount}</gold> from <white>{player}'s</white> bank balance.</green>"
-balance-reset: "<green>Reset <white>{player}'s</white> bank balance.</green>"
-item-give: "<green>Gave <gold>{amount}</gold> emerald(s) to <white>{player}</white>.</green>"
-item-take: "<green>Took <gold>{amount}</gold> emerald(s) from <white>{player}</white>.</green>"
-item-take-fail: "<red>Could not take {amount} emerald(s) from <white>{player}</white> as they don't have enough.</red>"
+balance-set: "<green>Set <white><player>'s</white> bank balance to <gold><amount></gold>.</green>"
+balance-add: "<green>Added <gold><amount></gold> to <white><player>'s</white> bank balance.</green>"
+balance-remove: "<green>Removed <gold><amount></gold> from <white><player>'s</white> bank balance.</green>"
+balance-reset: "<green>Reset <white><player>'s</white> bank balance.</green>"
+item-give: "<green>Gave <gold><amount></gold> emerald(s) to <white><player></white>.</green>"
+item-take: "<green>Took <gold><amount></gold> emerald(s) from <white><player></white>.</green>"
+item-take-fail: "<red>Could not take <amount> emerald(s) from <white><player></white> as they don't have enough.</red>"
 reload-success: "<green>KartaEmeraldCurrency configuration and messages reloaded successfully.</green>"
-migration-started: "<yellow>Starting database migration from {from} to {to}...</yellow>"
+migration-started: "<yellow>Starting database migration from <from> to <to>...</yellow>"
 migration-success: "<green>Database migration completed successfully.</green>"
 migration-failed: "<red>Database migration failed. Check console for errors.</red>"

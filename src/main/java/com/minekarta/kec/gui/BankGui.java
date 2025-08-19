@@ -54,7 +54,7 @@ public class BankGui extends AbstractGui {
                 inventory.setItem(slot, item);
             });
 
-            fill(guiConfig);
+            fill(guiConfig, balanceResolvers);
 
             // Open inventory on main thread
             plugin.getServer().getScheduler().runTask(plugin, () -> player.openInventory(inventory));

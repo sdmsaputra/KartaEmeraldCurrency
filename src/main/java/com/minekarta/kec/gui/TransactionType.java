@@ -11,5 +11,13 @@ public enum TransactionType {
     /**
      * A transaction to withdraw emeralds from the bank to the wallet.
      */
-    WITHDRAW
+    WITHDRAW,
+    /**
+     * The first step of a transfer: specifying the recipient player.
+     */
+    TRANSFER_PLAYER,
+    /**
+     * The second step of a transfer: specifying the amount.
+     */
+    TRANSFER_AMOUNT
 }

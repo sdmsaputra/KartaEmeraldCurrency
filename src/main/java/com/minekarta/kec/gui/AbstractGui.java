@@ -83,9 +83,7 @@ public abstract class AbstractGui implements InventoryHolder {
         if (meta != null) {
             String name = itemConfig.getString("name", "");
             if (!name.isEmpty()) {
-                // To prevent italics, we must deserialize with a tag resolver that includes the player's name.
-                // However, since we don't have the player here, we will just have to do it in the GUI class.
-                meta.displayName(MiniMessage.miniMessage().deserialize(name, resolvers));
+                meta.displayName(MiniMessage.miniMessage().deserialize("<italic:false>" + name, resolvers));
             }
 
             List<String> loreLines = itemConfig.getStringList("lore");
@@ -101,11 +99,11 @@ public abstract class AbstractGui implements InventoryHolder {
         return item;
     }
 
-    protected void fill(ConfigurationSection guiConfig) {
+    protected void fill(ConfigurationSection guiConfig, TagResolver resolvers) {
         ConfigurationSection fillConfig = guiConfig.getConfigurationSection("fill-item");
         if (fillConfig == null) return;
 
-        ItemStack fillItem = createItem(fillConfig);
+        ItemStack fillItem = createItem(fillConfig, resolvers);
         if (fillItem == null) return;
 
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -113,5 +111,9 @@ public abstract class AbstractGui implements InventoryHolder {
                 inventory.setItem(i, fillItem);
             }
         }
+    }
+
+    protected void fill(ConfigurationSection guiConfig) {
+        fill(guiConfig, TagResolver.empty());
     }
 }
