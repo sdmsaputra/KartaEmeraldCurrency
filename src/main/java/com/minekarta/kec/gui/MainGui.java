@@ -55,7 +55,7 @@ public class MainGui extends AbstractGui {
                 inventory.setItem(slot, item);
             });
 
-            fill(guiConfig);
+            fill(guiConfig, balanceResolvers);
 
             // Open inventory on main thread
             plugin.getServer().getScheduler().runTask(plugin, () -> player.openInventory(inventory));
@@ -76,10 +76,10 @@ public class MainGui extends AbstractGui {
                         new BankGui(plugin, player).open();
                         break;
                     case "transfer":
-                        player.sendMessage("Transfer GUI coming soon!");
+                        plugin.getChatInputManager().requestInput(player, TransactionType.TRANSFER_PLAYER);
                         break;
                     case "leaderboard":
-                        player.sendMessage("Leaderboard GUI coming soon!");
+                        new LeaderboardGui(plugin, player).open();
                         break;
                     case "close-button":
                         player.closeInventory();

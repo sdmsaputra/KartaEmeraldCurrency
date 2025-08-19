@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -214,6 +216,43 @@ public class H2Storage implements Storage {
                         // In a real app, you'd log this exception.
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<Map<UUID, Long>> getTopBalances(int limit, int offset) {
+        return supplyAsync(() -> {
+            Map<UUID, Long> topBalances = new LinkedHashMap<>();
+            String sql = "SELECT uuid, balance FROM kec_accounts ORDER BY balance DESC LIMIT ? OFFSET ?;";
+            try (Connection conn = dbManager.getDataSource().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, limit);
+                ps.setInt(2, offset);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    topBalances.put(UUID.fromString(rs.getString("uuid")), rs.getLong("balance"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to get top balances", e);
+            }
+            return topBalances;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Integer> getAccountCount() {
+        return supplyAsync(() -> {
+            String sql = "SELECT COUNT(*) FROM kec_accounts;";
+            try (Connection conn = dbManager.getDataSource().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to get account count", e);
             }
         });
     }

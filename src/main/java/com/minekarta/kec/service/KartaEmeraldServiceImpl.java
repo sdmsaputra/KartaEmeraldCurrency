@@ -195,6 +195,16 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
         return formatter;
     }
 
+    @Override
+    public CompletableFuture<Map<UUID, Long>> getTopBalances(int limit, int offset) {
+        return storage.getTopBalances(limit, offset);
+    }
+
+    @Override
+    public CompletableFuture<Integer> getAccountCount() {
+        return storage.getAccountCount();
+    }
+
     private static class Formatter implements CurrencyFormatter {
         private final NumberFormat commaFormat = NumberFormat.getNumberInstance(Locale.US);
 
