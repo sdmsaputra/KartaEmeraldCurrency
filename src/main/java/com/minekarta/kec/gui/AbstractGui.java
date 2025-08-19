@@ -3,6 +3,7 @@ package com.minekarta.kec.gui;
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -67,6 +68,10 @@ public abstract class AbstractGui implements InventoryHolder {
     }
 
     protected ItemStack createItem(ConfigurationSection itemConfig) {
+        return createItem(itemConfig, TagResolver.empty());
+    }
+
+    protected ItemStack createItem(ConfigurationSection itemConfig, TagResolver resolvers) {
         if (itemConfig == null) return null;
 
         Material material = Material.matchMaterial(itemConfig.getString("material", "STONE"));
@@ -78,13 +83,15 @@ public abstract class AbstractGui implements InventoryHolder {
         if (meta != null) {
             String name = itemConfig.getString("name", "");
             if (!name.isEmpty()) {
-                meta.displayName(MiniMessage.miniMessage().deserialize(name));
+                // To prevent italics, we must deserialize with a tag resolver that includes the player's name.
+                // However, since we don't have the player here, we will just have to do it in the GUI class.
+                meta.displayName(MiniMessage.miniMessage().deserialize(name, resolvers));
             }
 
             List<String> loreLines = itemConfig.getStringList("lore");
             if (!loreLines.isEmpty()) {
                 List<Component> lore = loreLines.stream()
-                        .map(line -> MiniMessage.miniMessage().deserialize(line))
+                        .map(line -> MiniMessage.miniMessage().deserialize("<italic:false>" + line, resolvers))
                         .collect(Collectors.toList());
                 meta.lore(lore);
             }

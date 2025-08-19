@@ -8,10 +8,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The bank GUI for depositing and withdrawing emeralds.
@@ -119,24 +115,4 @@ public class BankGui extends AbstractGui {
         });
     }
 
-    // Override createItem to handle placeholders
-    private ItemStack createItem(ConfigurationSection itemConfig, TagResolver resolvers) {
-        ItemStack item = super.createItem(itemConfig);
-        if (item == null) return null;
-
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            if (meta.hasDisplayName()) {
-                meta.displayName(MiniMessage.miniMessage().deserialize(MiniMessage.miniMessage().serialize(meta.displayName()), resolvers));
-            }
-            if (meta.hasLore()) {
-                List<String> loreLines = itemConfig.getStringList("lore");
-                meta.lore(loreLines.stream()
-                        .map(line -> MiniMessage.miniMessage().deserialize(line, resolvers))
-                        .collect(Collectors.toList()));
-            }
-            item.setItemMeta(meta);
-        }
-        return item;
-    }
 }
