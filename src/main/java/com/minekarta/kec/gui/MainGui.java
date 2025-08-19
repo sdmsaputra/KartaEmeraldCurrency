@@ -1,9 +1,6 @@
 package com.minekarta.kec.gui;
 
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -35,31 +32,20 @@ public class MainGui extends AbstractGui {
         int size = guiConfig.getInt("size", 36);
         createInventory(title, size);
 
-        // Asynchronously fetch balance and then populate the GUI
-        plugin.getService().getBankBalance(player.getUniqueId()).thenAccept(bankBalance -> {
-            long walletBalance = plugin.getService().getWalletBalance(player);
-            long totalBalance = bankBalance + walletBalance;
-
-            TagResolver balanceResolvers = TagResolver.builder()
-                    .resolver(Placeholder.unparsed("player_name", player.getName()))
-                    .resolver(Placeholder.unparsed("balance_bank", plugin.getService().getFormatter().formatWithCommas(bankBalance)))
-                    .resolver(Placeholder.unparsed("balance_wallet", plugin.getService().getFormatter().formatWithCommas(walletBalance)))
-                    .resolver(Placeholder.unparsed("balance_total", plugin.getService().getFormatter().formatWithCommas(totalBalance)))
-                    .build();
-
-            // Set items from config
-            guiConfig.getConfigurationSection("items").getKeys(false).forEach(key -> {
-                ConfigurationSection itemConfig = guiConfig.getConfigurationSection("items." + key);
+        // Set items from config
+        ConfigurationSection itemsConfig = guiConfig.getConfigurationSection("items");
+        if (itemsConfig != null) {
+            itemsConfig.getKeys(false).forEach(key -> {
+                ConfigurationSection itemConfig = itemsConfig.getConfigurationSection(key);
                 int slot = itemConfig.getInt("slot");
-                ItemStack item = createItem(itemConfig, balanceResolvers);
+                ItemStack item = createItem(itemConfig);
                 inventory.setItem(slot, item);
             });
+        }
 
-            fill(guiConfig, balanceResolvers);
+        fill(guiConfig);
 
-            // Open inventory on main thread
-            plugin.getServer().getScheduler().runTask(plugin, () -> player.openInventory(inventory));
-        });
+        player.openInventory(inventory);
     }
 
     @Override
@@ -89,5 +75,4 @@ public class MainGui extends AbstractGui {
             }
         }
     }
-
 }

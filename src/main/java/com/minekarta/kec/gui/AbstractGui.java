@@ -1,6 +1,7 @@
 package com.minekarta.kec.gui;
 
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -23,38 +24,17 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractGui implements InventoryHolder {
 
-    /**
-     * The plugin instance.
-     */
     protected final KartaEmeraldCurrencyPlugin plugin;
-    /**
-     * The player viewing the GUI.
-     */
     protected final Player player;
-    /**
-     * The inventory for this GUI.
-     */
     protected Inventory inventory;
 
-    /**
-     * Constructs a new AbstractGui.
-     * @param plugin The plugin instance.
-     * @param player The player viewing the GUI.
-     */
     public AbstractGui(KartaEmeraldCurrencyPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
     }
 
-    /**
-     * Opens the GUI for the player.
-     */
     public abstract void open();
 
-    /**
-     * Handles a click event in the GUI.
-     * @param event The click event.
-     */
     public abstract void handleClick(InventoryClickEvent event);
 
     @Override
@@ -62,16 +42,13 @@ public abstract class AbstractGui implements InventoryHolder {
         return inventory;
     }
 
-    protected void createInventory(String title, int size) {
-        Component parsedTitle = MiniMessage.miniMessage().deserialize(title);
+    protected void createInventory(String title, int size, TagResolver... resolvers) {
+        String processedTitle = PlaceholderAPI.setPlaceholders(player, title);
+        Component parsedTitle = MiniMessage.miniMessage().deserialize(processedTitle, resolvers);
         this.inventory = Bukkit.createInventory(this, size, parsedTitle);
     }
 
-    protected ItemStack createItem(ConfigurationSection itemConfig) {
-        return createItem(itemConfig, TagResolver.empty());
-    }
-
-    protected ItemStack createItem(ConfigurationSection itemConfig, TagResolver resolvers) {
+    protected ItemStack createItem(ConfigurationSection itemConfig, TagResolver... resolvers) {
         if (itemConfig == null) return null;
 
         Material material = Material.matchMaterial(itemConfig.getString("material", "STONE"));
@@ -83,13 +60,17 @@ public abstract class AbstractGui implements InventoryHolder {
         if (meta != null) {
             String name = itemConfig.getString("name", "");
             if (!name.isEmpty()) {
-                meta.displayName(MiniMessage.miniMessage().deserialize("<italic:false>" + name, resolvers));
+                String processedName = PlaceholderAPI.setPlaceholders(player, "<italic:false>" + name);
+                meta.displayName(MiniMessage.miniMessage().deserialize(processedName, resolvers));
             }
 
             List<String> loreLines = itemConfig.getStringList("lore");
             if (!loreLines.isEmpty()) {
                 List<Component> lore = loreLines.stream()
-                        .map(line -> MiniMessage.miniMessage().deserialize("<italic:false>" + line, resolvers))
+                        .map(line -> {
+                            String processedLine = PlaceholderAPI.setPlaceholders(player, "<italic:false>" + line);
+                            return MiniMessage.miniMessage().deserialize(processedLine, resolvers);
+                        })
                         .collect(Collectors.toList());
                 meta.lore(lore);
             }
@@ -99,7 +80,7 @@ public abstract class AbstractGui implements InventoryHolder {
         return item;
     }
 
-    protected void fill(ConfigurationSection guiConfig, TagResolver resolvers) {
+    protected void fill(ConfigurationSection guiConfig, TagResolver... resolvers) {
         ConfigurationSection fillConfig = guiConfig.getConfigurationSection("fill-item");
         if (fillConfig == null) return;
 
@@ -111,9 +92,5 @@ public abstract class AbstractGui implements InventoryHolder {
                 inventory.setItem(i, fillItem);
             }
         }
-    }
-
-    protected void fill(ConfigurationSection guiConfig) {
-        fill(guiConfig, TagResolver.empty());
     }
 }

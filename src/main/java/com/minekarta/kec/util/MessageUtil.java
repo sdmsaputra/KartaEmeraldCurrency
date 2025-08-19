@@ -1,12 +1,14 @@
 package com.minekarta.kec.util;
 
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 /**
  * A utility class for sending messages to players.
@@ -16,9 +18,6 @@ public class MessageUtil {
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private static String prefix = "";
 
-    /**
-     * Private constructor to prevent instantiation.
-     */
     private MessageUtil() {
         // Utility class
     }
@@ -41,9 +40,7 @@ public class MessageUtil {
     public static void sendMessage(CommandSender target, String messageKey, TagResolver... resolvers) {
         KartaEmeraldCurrencyPlugin plugin = KartaEmeraldCurrencyPlugin.getInstance();
         String message = plugin.getMessagesConfig().getString(messageKey, "<red>Unknown message key: " + messageKey + "</red>");
-
-        Component parsedMessage = miniMessage.deserialize(prefix + message, resolvers);
-        target.sendMessage(parsedMessage);
+        sendRawMessage(target, prefix + message, resolvers);
     }
 
     /**
@@ -53,7 +50,12 @@ public class MessageUtil {
      * @param resolvers Placeholders to use in the message.
      */
     public static void sendRawMessage(CommandSender target, String message, TagResolver... resolvers) {
-        Component parsedMessage = miniMessage.deserialize(message, resolvers);
+        String processedMessage = message;
+        if (target instanceof Player && KartaEmeraldCurrencyPlugin.isPlaceholderApiHooked()) {
+            processedMessage = PlaceholderAPI.setPlaceholders((Player) target, message);
+        }
+
+        Component parsedMessage = miniMessage.deserialize(processedMessage, resolvers);
         target.sendMessage(parsedMessage);
     }
 
