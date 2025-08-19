@@ -48,8 +48,14 @@ public class DatabaseManager {
                 if (!dbFile.getParentFile().exists()) {
                     dbFile.getParentFile().mkdirs();
                 }
+                config.setPoolName("KartaEmerald-H2-Pool");
                 config.setDriverClassName("com.minekarta.kec.libs.h2.Driver");
-                config.setJdbcUrl("jdbc:h2:" + dbFile.getAbsolutePath());
+                // AUTO_SERVER=TRUE allows multiple connections within the same JVM, preventing file lock issues.
+                config.setJdbcUrl("jdbc:h2:" + dbFile.getAbsolutePath() + ";AUTO_SERVER=TRUE");
+
+                // Sensible pool settings for H2
+                config.setMaximumPoolSize(2);
+                config.setConnectionTimeout(TimeUnit.SECONDS.toMillis(10));
                 break;
 
             case MYSQL:

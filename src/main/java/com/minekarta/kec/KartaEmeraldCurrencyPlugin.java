@@ -129,7 +129,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
                 this.storage = new H2Storage(databaseManager, asyncExecutor);
             }
 
-            this.storage.initialize().join(); // Wait for table creation on startup
+            this.storage.initialize(); // Create tables on startup
             getLogger().info("Successfully connected to " + storageType + " database.");
             return true;
         } catch (Exception e) {
@@ -146,8 +146,10 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
             Bukkit.getServicesManager().register(net.milkbowl.vault.economy.Economy.class, vaultAdapter, this, ServicePriority.High);
             getLogger().info("Successfully hooked into Vault.");
 
-            // Fire event for other plugins
-            Bukkit.getPluginManager().callEvent(new com.minekarta.kec.api.event.EconomyProviderRegisteredEvent(vaultAdapter.getName()));
+            // Fire event for other plugins, required by Paper to be async.
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                Bukkit.getPluginManager().callEvent(new com.minekarta.kec.api.event.EconomyProviderRegisteredEvent(vaultAdapter.getName()));
+            });
         } else {
             getLogger().warning("Vault not found. Economy features will be limited.");
         }
