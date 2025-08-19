@@ -48,6 +48,7 @@ public class DatabaseManager {
                 if (!dbFile.getParentFile().exists()) {
                     dbFile.getParentFile().mkdirs();
                 }
+                config.setDriverClassName("com.minekarta.kec.libs.h2.Driver");
                 config.setJdbcUrl("jdbc:h2:" + dbFile.getAbsolutePath());
                 break;
 
