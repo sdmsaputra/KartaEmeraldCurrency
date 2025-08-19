@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+/**
+ * The main plugin class for KartaEmeraldCurrency.
+ * Handles loading, enabling, and disabling of the plugin's features.
+ */
 public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
     private static KartaEmeraldCurrencyPlugin instance;
@@ -32,6 +36,10 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
     private FileConfiguration guiConfig;
     private FileConfiguration databaseConfig;
 
+    /**
+     * Called when the plugin is enabled.
+     * Initializes configurations, database, services, and hooks.
+     */
     @Override
     public void onEnable() {
         instance = this;
@@ -59,6 +67,10 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
         getLogger().info("KartaEmeraldCurrency has been enabled successfully.");
     }
 
+    /**
+     * Called when the plugin is disabled.
+     * Closes the database connection.
+     */
     @Override
     public void onDisable() {
         if (storage != null) {
@@ -157,22 +169,42 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
         // TODO: Register other listeners like PlayerJoinListener
     }
 
+    /**
+     * Gets the singleton instance of the plugin.
+     * @return The plugin instance.
+     */
     public static KartaEmeraldCurrencyPlugin getInstance() {
         return instance;
     }
 
+    /**
+     * Gets the active KartaEmeraldService API instance.
+     * @return The economy service.
+     */
     public KartaEmeraldService getService() {
         return service;
     }
 
+    /**
+     * Gets the main plugin configuration (config.yml).
+     * @return The main configuration.
+     */
     public FileConfiguration getPluginConfig() {
         return getConfig();
     }
 
+    /**
+     * Gets the messages configuration (messages.yml).
+     * @return The messages configuration.
+     */
     public FileConfiguration getMessagesConfig() {
         return messagesConfig;
     }
 
+    /**
+     * Gets the GUI configuration (gui.yml).
+     * @return The GUI configuration.
+     */
     public FileConfiguration getGuiConfig() {
         return guiConfig;
     }
