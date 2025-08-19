@@ -22,13 +22,14 @@ java {
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://jitpack.io") // For VaultAPI
 }
 
 dependencies {
     // Compile-Only Dependencies (provided by server or other plugins)
     compileOnly("io.papermc.paper:paper-api:${properties.getProperty("paperApiVersion")}")
-    compileOnly("net.milkbowl.vault:VaultAPI:${properties.getProperty("vaultApiVersion")}")
+    compileOnly("com.github.MilkBowl:VaultAPI:${properties.getProperty("vaultApiVersion")}")
     compileOnly("me.clip:placeholderapi:${properties.getProperty("placeholderApiVersion")}")
     compileOnly("mysql:mysql-connector-java:8.0.33") // For compiling against, not for bundling
 
