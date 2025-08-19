@@ -1,6 +1,7 @@
 package com.minekarta.kec.gui;
 
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.ConfigurationSection;

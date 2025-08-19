@@ -101,7 +101,71 @@ public class VaultEconomyAdapter extends AbstractEconomy {
         return true;
     }
 
+    @Override
+    public boolean hasAccount(String playerName) {
+        return hasAccount(Bukkit.getOfflinePlayer(playerName));
+    }
+
+    @Override
+    public boolean hasAccount(String playerName, String worldName) {
+        return hasAccount(playerName);
+    }
+
+    @Override
+    public double getBalance(String playerName) {
+        return getBalance(Bukkit.getOfflinePlayer(playerName));
+    }
+
+    @Override
+    public double getBalance(String playerName, String world) {
+        return getBalance(playerName);
+    }
+
+    @Override
+    public boolean has(String playerName, double amount) {
+        return has(Bukkit.getOfflinePlayer(playerName), amount);
+    }
+
+    @Override
+    public boolean has(String playerName, String worldName, double amount) {
+        return has(playerName, amount);
+    }
+
+    @Override
+    public EconomyResponse withdrawPlayer(String playerName, double amount) {
+        return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount);
+    }
+
+    @Override
+    public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
+        return withdrawPlayer(playerName, amount);
+    }
+
+    @Override
+    public EconomyResponse depositPlayer(String playerName, double amount) {
+        return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount);
+    }
+
+    @Override
+    public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
+        return depositPlayer(playerName, amount);
+    }
+
+    @Override
+    public boolean createPlayerAccount(String playerName) {
+        return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
+    }
+
+    @Override
+    public boolean createPlayerAccount(String playerName, String worldName) {
+        return createPlayerAccount(playerName);
+    }
+
     // Unsupported Operations
+    @Override
+    public EconomyResponse createBank(String name, String player) {
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
+    }
     @Override
     public EconomyResponse createBank(String name, OfflinePlayer player) {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
@@ -131,7 +195,15 @@ public class VaultEconomyAdapter extends AbstractEconomy {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
     }
     @Override
+    public EconomyResponse isBankOwner(String name, String playerName) {
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
+    }
+    @Override
     public EconomyResponse isBankMember(String name, OfflinePlayer player) {
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
+    }
+    @Override
+    public EconomyResponse isBankMember(String name, String playerName) {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
     }
     @Override
