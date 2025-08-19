@@ -129,7 +129,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
                 this.storage = new H2Storage(databaseManager, asyncExecutor);
             }
 
-            this.storage.initialize().join(); // Wait for table creation on startup
+            this.storage.initialize(); // Create tables on startup
             getLogger().info("Successfully connected to " + storageType + " database.");
             return true;
         } catch (Exception e) {
