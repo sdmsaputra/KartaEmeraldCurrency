@@ -3,6 +3,7 @@ package com.minekarta.kec;
 import com.minekarta.kec.api.KartaEmeraldService;
 import com.minekarta.kec.command.EmeraldAdminCommand;
 import com.minekarta.kec.command.EmeraldCommand;
+import com.minekarta.kec.gui.ChatInputManager;
 import com.minekarta.kec.service.KartaEmeraldServiceImpl;
 import com.minekarta.kec.storage.DatabaseManager;
 import com.minekarta.kec.util.MessageUtil;
@@ -38,6 +39,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
     private Storage storage;
     private KartaEmeraldService service;
     private DatabaseManager databaseManager;
+    private ChatInputManager chatInputManager;
 
     private FileConfiguration messagesConfig;
     private FileConfiguration guiConfig;
@@ -65,6 +67,9 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
         // Setup Service
         this.service = new KartaEmeraldServiceImpl(this, this.storage);
         Bukkit.getServicesManager().register(KartaEmeraldService.class, this.service, this, ServicePriority.Normal);
+
+        // Setup Chat Input Manager
+        this.chatInputManager = new ChatInputManager(this);
 
         // Register Hooks, Commands, Listeners
         setupHooks();
@@ -129,7 +134,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
                 this.storage = new H2Storage(databaseManager, asyncExecutor);
             }
 
-            this.storage.initialize().join(); // Wait for table creation on startup
+            this.storage.initialize(); // Create tables on startup
             getLogger().info("Successfully connected to " + storageType + " database.");
             return true;
         } catch (Exception e) {
@@ -146,8 +151,10 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
             Bukkit.getServicesManager().register(net.milkbowl.vault.economy.Economy.class, vaultAdapter, this, ServicePriority.High);
             getLogger().info("Successfully hooked into Vault.");
 
-            // Fire event for other plugins
-            Bukkit.getPluginManager().callEvent(new com.minekarta.kec.api.event.EconomyProviderRegisteredEvent(vaultAdapter.getName()));
+            // Fire event for other plugins, required by Paper to be async.
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                Bukkit.getPluginManager().callEvent(new com.minekarta.kec.api.event.EconomyProviderRegisteredEvent(vaultAdapter.getName()));
+            });
         } else {
             getLogger().warning("Vault not found. Economy features will be limited.");
         }
@@ -173,6 +180,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
     private void setupListeners() {
         Bukkit.getPluginManager().registerEvents(new com.minekarta.kec.gui.GuiListener(), this);
+        Bukkit.getPluginManager().registerEvents(this.chatInputManager, this);
         // TODO: Register other listeners like PlayerJoinListener
     }
 
@@ -214,5 +222,13 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
      */
     public FileConfiguration getGuiConfig() {
         return guiConfig;
+    }
+
+    /**
+     * Gets the chat input manager.
+     * @return The chat input manager.
+     */
+    public ChatInputManager getChatInputManager() {
+        return chatInputManager;
     }
 }

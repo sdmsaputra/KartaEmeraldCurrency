@@ -14,41 +14,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The main GUI for the KartaEmeraldCurrency plugin.
+ * The bank GUI for depositing and withdrawing emeralds.
  */
-public class MainGui extends AbstractGui {
+public class BankGui extends AbstractGui {
 
     /**
-     * Constructs a new MainGui.
+     * Constructs a new BankGui.
+     *
      * @param plugin The plugin instance.
      * @param player The player viewing the GUI.
      */
-    public MainGui(KartaEmeraldCurrencyPlugin plugin, Player player) {
+    public BankGui(KartaEmeraldCurrencyPlugin plugin, Player player) {
         super(plugin, player);
     }
 
     @Override
     public void open() {
-        ConfigurationSection guiConfig = plugin.getGuiConfig().getConfigurationSection("main-menu");
+        ConfigurationSection guiConfig = plugin.getGuiConfig().getConfigurationSection("bank-menu");
         if (guiConfig == null) {
-            player.sendMessage("Main GUI not configured!");
+            player.sendMessage("Bank GUI not configured!");
             return;
         }
 
-        String title = guiConfig.getString("title", "Main Menu");
-        int size = guiConfig.getInt("size", 36);
+        String title = guiConfig.getString("title", "Bank");
+        int size = guiConfig.getInt("size", 54);
         createInventory(title, size);
 
         // Asynchronously fetch balance and then populate the GUI
         plugin.getService().getBankBalance(player.getUniqueId()).thenAccept(bankBalance -> {
             long walletBalance = plugin.getService().getWalletBalance(player);
-            long totalBalance = bankBalance + walletBalance;
 
             TagResolver balanceResolvers = TagResolver.builder()
                     .resolver(Placeholder.unparsed("player_name", player.getName()))
                     .resolver(Placeholder.unparsed("balance_bank", plugin.getService().getFormatter().formatWithCommas(bankBalance)))
                     .resolver(Placeholder.unparsed("balance_wallet", plugin.getService().getFormatter().formatWithCommas(walletBalance)))
-                    .resolver(Placeholder.unparsed("balance_total", plugin.getService().getFormatter().formatWithCommas(totalBalance)))
                     .build();
 
             // Set items from config
@@ -69,21 +68,24 @@ public class MainGui extends AbstractGui {
     @Override
     public void handleClick(InventoryClickEvent event) {
         int slot = event.getSlot();
-        ConfigurationSection guiConfig = plugin.getGuiConfig().getConfigurationSection("main-menu.items");
+        ConfigurationSection guiConfig = plugin.getGuiConfig().getConfigurationSection("bank-menu.items");
         if (guiConfig == null) return;
 
         // Find which item was clicked by checking slots in config
         for (String key : guiConfig.getKeys(false)) {
             if (guiConfig.getInt(key + ".slot") == slot) {
                 switch (key) {
-                    case "bank-access":
-                        new BankGui(plugin, player).open();
+                    case "deposit-custom":
+                        plugin.getChatInputManager().requestInput(player, TransactionType.DEPOSIT);
                         break;
-                    case "transfer":
-                        player.sendMessage("Transfer GUI coming soon!");
+                    case "withdraw-custom":
+                        plugin.getChatInputManager().requestInput(player, TransactionType.WITHDRAW);
                         break;
-                    case "leaderboard":
-                        player.sendMessage("Leaderboard GUI coming soon!");
+                    case "deposit-all":
+                        handleDepositAll();
+                        break;
+                    case "back-button":
+                        new MainGui(plugin, player).open();
                         break;
                     case "close-button":
                         player.closeInventory();
@@ -92,6 +94,29 @@ public class MainGui extends AbstractGui {
                 return;
             }
         }
+    }
+
+    private void handleDepositAll() {
+        long walletBalance = plugin.getService().getWalletBalance(player);
+        if (walletBalance <= 0) {
+            //TODO: Move to messages.yml
+            player.sendMessage("§cYou don't have any emeralds in your inventory to deposit.");
+            return;
+        }
+
+        plugin.getService().depositToBank(player.getUniqueId(), walletBalance).thenAccept(success -> {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                if (success) {
+                    //TODO: Move to messages.yml
+                    player.sendMessage("§aSuccessfully deposited all " + plugin.getService().getFormatter().formatWithCommas(walletBalance) + " emeralds.");
+                    // Re-open the GUI to show updated balance
+                    open();
+                } else {
+                    // This case should ideally not happen if walletBalance > 0
+                    player.sendMessage("§cAn unexpected error occurred during deposit.");
+                }
+            });
+        });
     }
 
     // Override createItem to handle placeholders

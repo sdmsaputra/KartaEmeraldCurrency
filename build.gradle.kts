@@ -32,10 +32,10 @@ dependencies {
     compileOnly("com.github.milkbowl:VaultAPI:${properties.getProperty("vaultApiVersion")}")
     compileOnly("me.clip:placeholderapi:${properties.getProperty("placeholderApiVersion")}")
     compileOnly("mysql:mysql-connector-java:8.0.33") // For compiling against, not for bundling
+    compileOnly("net.kyori:adventure-text-minimessage:${properties.getProperty("miniMessageVersion")}")
 
     // Implementation Dependencies (to be shaded)
     implementation("com.zaxxer:HikariCP:${properties.getProperty("hikariVersion")}")
-    implementation("net.kyori:adventure-text-minimessage:${properties.getProperty("miniMessageVersion")}")
     implementation("com.h2database:h2:${properties.getProperty("h2DriverVersion")}")
 }
 
@@ -51,7 +51,6 @@ tasks {
     shadowJar {
         archiveClassifier.set("") // Produce a single jar without the '-all' suffix
         relocate("com.zaxxer.hikari", "com.minekarta.kec.libs.hikaricp")
-        relocate("net.kyori.adventure", "com.minekarta.kec.libs.adventure")
         relocate("org.h2", "com.minekarta.kec.libs.h2")
     }
 
