@@ -18,11 +18,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Handles the /emeraldadmin command.
+ */
 public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
 
     private final KartaEmeraldCurrencyPlugin plugin;
     private final KartaEmeraldService service;
 
+    /**
+     * Constructs a new EmeraldAdminCommand.
+     * @param plugin The plugin instance.
+     */
     public EmeraldAdminCommand(KartaEmeraldCurrencyPlugin plugin) {
         this.plugin = plugin;
         this.service = plugin.getService();

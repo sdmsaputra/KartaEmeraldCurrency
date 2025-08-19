@@ -13,6 +13,11 @@ public class EconomyProviderRegisteredEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final String economyName;
 
+    /**
+     * Constructs a new EconomyProviderRegisteredEvent.
+     *
+     * @param economyName The name of the economy provider.
+     */
     public EconomyProviderRegisteredEvent(@NotNull String economyName) {
         super(true); // This can be async as it's just a notification
         this.economyName = economyName;
@@ -33,6 +38,10 @@ public class EconomyProviderRegisteredEvent extends Event {
         return handlers;
     }
 
+    /**
+     * Gets the handler list for this event.
+     * @return The handler list.
+     */
     @NotNull
     public static HandlerList getHandlerList() {
         return handlers;

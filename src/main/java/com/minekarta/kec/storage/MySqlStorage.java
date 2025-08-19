@@ -11,6 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
+/**
+ * A MySQL implementation of the {@link Storage} interface.
+ */
 public class MySqlStorage implements Storage {
 
     private final DatabaseManager dbManager;
@@ -38,6 +41,12 @@ public class MySqlStorage implements Storage {
             UPDATE kec_accounts SET balance = balance - ? WHERE uuid = ?;
             """; // A simple update is better here for MySQL
 
+    /**
+     * Constructs a new MySqlStorage.
+     *
+     * @param dbManager The database manager.
+     * @param asyncExecutor The executor for async tasks.
+     */
     public MySqlStorage(DatabaseManager dbManager, Executor asyncExecutor) {
         this.dbManager = dbManager;
         this.asyncExecutor = asyncExecutor;

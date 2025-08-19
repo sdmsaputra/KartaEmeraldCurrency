@@ -26,6 +26,13 @@ import java.util.concurrent.Executor;
  */
 public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
+    /**
+     * Constructs a new KartaEmeraldCurrencyPlugin.
+     */
+    public KartaEmeraldCurrencyPlugin() {
+        // Default constructor
+    }
+
     private static KartaEmeraldCurrencyPlugin instance;
 
     private Storage storage;

@@ -17,6 +17,12 @@ public class BankWithdrawEvent extends Event implements Cancellable {
     private final Player player;
     private long amount;
 
+    /**
+     * Constructs a new BankWithdrawEvent.
+     *
+     * @param player The player withdrawing.
+     * @param amount The amount being withdrawn.
+     */
     public BankWithdrawEvent(@NotNull Player player, long amount) {
         super(false); // This event involves inventory, so it must be synchronous
         this.player = player;
@@ -64,6 +70,10 @@ public class BankWithdrawEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    /**
+     * Gets the handler list for this event.
+     * @return The handler list.
+     */
     @NotNull
     public static HandlerList getHandlerList() {
         return handlers;

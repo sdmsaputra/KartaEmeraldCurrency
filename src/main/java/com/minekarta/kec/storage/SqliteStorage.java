@@ -11,6 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
+/**
+ * A SQLite implementation of the {@link Storage} interface.
+ */
 public class SqliteStorage implements Storage {
 
     private final DatabaseManager dbManager;
@@ -39,6 +42,12 @@ public class SqliteStorage implements Storage {
             """;
 
 
+    /**
+     * Constructs a new SqliteStorage.
+     *
+     * @param dbManager The database manager.
+     * @param asyncExecutor The executor for async tasks.
+     */
     public SqliteStorage(DatabaseManager dbManager, Executor asyncExecutor) {
         this.dbManager = dbManager;
         this.asyncExecutor = asyncExecutor;

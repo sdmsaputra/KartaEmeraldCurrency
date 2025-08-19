@@ -17,19 +17,43 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents an abstract GUI screen.
+ */
 public abstract class AbstractGui implements InventoryHolder {
 
+    /**
+     * The plugin instance.
+     */
     protected final KartaEmeraldCurrencyPlugin plugin;
+    /**
+     * The player viewing the GUI.
+     */
     protected final Player player;
+    /**
+     * The inventory for this GUI.
+     */
     protected Inventory inventory;
 
+    /**
+     * Constructs a new AbstractGui.
+     * @param plugin The plugin instance.
+     * @param player The player viewing the GUI.
+     */
     public AbstractGui(KartaEmeraldCurrencyPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
     }
 
+    /**
+     * Opens the GUI for the player.
+     */
     public abstract void open();
 
+    /**
+     * Handles a click event in the GUI.
+     * @param event The click event.
+     */
     public abstract void handleClick(InventoryClickEvent event);
 
     @Override

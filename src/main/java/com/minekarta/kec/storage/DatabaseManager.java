@@ -17,10 +17,27 @@ public class DatabaseManager {
 
     private final HikariDataSource dataSource;
 
+    /**
+     * Enum for the supported storage types.
+     */
     public enum StorageType {
-        SQLITE, MYSQL
+        /**
+         * Use SQLite for data storage.
+         */
+        SQLITE,
+        /**
+         * Use MySQL for data storage.
+         */
+        MYSQL
     }
 
+    /**
+     * Constructs a new DatabaseManager.
+     *
+     * @param type The type of storage to use.
+     * @param dbProps The database properties.
+     * @param dataFolderPath The path to the plugin's data folder.
+     */
     public DatabaseManager(@NotNull StorageType type, @NotNull Properties dbProps, @NotNull Path dataFolderPath) {
         HikariConfig config = new HikariConfig();
 

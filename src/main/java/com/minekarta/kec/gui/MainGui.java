@@ -13,8 +13,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The main GUI for the KartaEmeraldCurrency plugin.
+ */
 public class MainGui extends AbstractGui {
 
+    /**
+     * Constructs a new MainGui.
+     * @param plugin The plugin instance.
+     * @param player The player viewing the GUI.
+     */
     public MainGui(KartaEmeraldCurrencyPlugin plugin, Player player) {
         super(plugin, player);
     }

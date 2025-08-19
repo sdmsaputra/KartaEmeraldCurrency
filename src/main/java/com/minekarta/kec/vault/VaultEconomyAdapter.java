@@ -101,76 +101,91 @@ public class VaultEconomyAdapter extends AbstractEconomy {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasAccount(String playerName) {
         return hasAccount(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public double getBalance(String playerName) {
         return getBalance(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean has(String playerName, double amount) {
         return has(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
         return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
         return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean createPlayerAccount(String playerName) {
         return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasAccount(String playerName, String worldName) {
         return hasAccount(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public double getBalance(String playerName, String world) {
         return getBalance(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean has(String playerName, String worldName, double amount) {
         return has(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
         return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
         return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean createPlayerAccount(String playerName, String worldName) {
         return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public EconomyResponse createBank(String name, String player) {
         return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "KEC does not support multiple banks.");
