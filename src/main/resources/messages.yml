@@ -1,6 +1,7 @@
 # KartaEmeraldCurrency - Message Configuration
 # All messages support MiniMessage format: https://docs.advntr.dev/minimessage/format.html
-# Placeholders like {player}, {amount}, {balance} will be replaced automatically.
+# Global placeholders use the %placeholder% format (e.g., %player_name%).
+# Context-specific placeholders use the {placeholder} format (e.g., {amount}).
 
 prefix: "<dark_gray>[<green>KEC</green>]<reset> "
 
@@ -21,19 +22,19 @@ cannot-pay-self: "<red>You cannot pay yourself.</red>"
 
 # Balance command
 balance:
-  header: "<gray>--- <green>Balance</green> ---</gray>"
-  bank: "<white>Bank: <gold>{balance_bank}</gold></white>"
-  wallet: "<white>Wallet: <gold>{balance_wallet}</gold> (Physical)</white>"
-  total: "<white>Total: <green>{balance_total}</green></white>"
+  header: "<gray>--- <green>Balance for %player_name%</green> ---</gray>"
+  bank: "<white>Bank: <gold>%kartaemerald_balance_bank_formatted%</gold></white>"
+  wallet: "<white>Wallet: <gold>%kartaemerald_balance_wallet_formatted%</gold> (Physical)</white>"
+  total: "<white>Total: <green>%kartaemerald_balance_total_formatted%</green></white>"
   footer: "<gray>-----------------</gray>"
 
 # Deposit command
-deposit-success: "<green>Successfully deposited <gold>{amount}</gold> emerald(s) into your bank.</green>"
-deposit-all-success: "<green>Successfully deposited all <gold>{amount}</gold> emerald(s) from your inventory.</green>"
+deposit-success: "<green>Successfully deposited <gold>{amount}</gold> emerald(s). New balance: <gold>%kartaemerald_balance_bank_formatted%</gold></green>"
+deposit-all-success: "<green>Successfully deposited all <gold>{amount}</gold> emerald(s). New balance: <gold>%kartaemerald_balance_bank_formatted%</gold></green>"
 deposit-fail-no-items: "<yellow>You don't have any emeralds to deposit.</yellow>"
 
 # Withdraw command
-withdraw-success: "<green>Successfully withdrew <gold>{amount}</gold> emerald(s) from your bank.</green>"
+withdraw-success: "<green>Successfully withdrew <gold>{amount}</gold> emerald(s). New balance: <gold>%kartaemerald_balance_bank_formatted%</gold></green>"
 withdraw-fail-limit: "<red>Cannot withdraw. This would exceed the maximum physical stack limit.</red>"
 
 # Pay/Transfer command

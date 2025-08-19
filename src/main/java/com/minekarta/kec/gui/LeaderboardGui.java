@@ -39,13 +39,10 @@ public class LeaderboardGui extends AbstractGui {
             return;
         }
 
-        String title = guiConfig.getString("title", "Leaderboard");
-        int size = guiConfig.getInt("size", 54);
-        createInventory(title, size);
-
         plugin.getService().getAccountCount().thenAcceptBoth(
                 plugin.getService().getTopBalances(ENTRIES_PER_PAGE, page * ENTRIES_PER_PAGE),
                 (totalAccounts, topBalances) -> {
+                    // Run GUI updates on the main thread
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         populateGui(guiConfig, totalAccounts, topBalances);
                     });
@@ -53,9 +50,14 @@ public class LeaderboardGui extends AbstractGui {
         );
     }
 
-    private void populateGui(ConfigurationSection guiConfig, int totalAccounts, Map<UUID, Long> topBalances) {
+    private void populateGui(ConfigurationSection guiConfig, long totalAccounts, Map<UUID, Long> topBalances) {
         int maxPage = (int) Math.ceil((double) totalAccounts / ENTRIES_PER_PAGE);
         if (maxPage == 0) maxPage = 1;
+
+        TagResolver pageTitleResolver = MessageUtil.placeholder("page", page + 1);
+        String title = guiConfig.getString("title", "Leaderboard");
+        int size = guiConfig.getInt("size", 54);
+        createInventory(title, size, pageTitleResolver);
 
         // Populate player items
         ConfigurationSection playerItemConfig = guiConfig.getConfigurationSection("player-item");
@@ -67,16 +69,23 @@ public class LeaderboardGui extends AbstractGui {
 
             Map.Entry<UUID, Long> entry = entries.get(i);
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(entry.getKey());
-            String playerName = offlinePlayer.getName() != null ? offlinePlayer.getName() : "Unknown";
-            long balance = entry.getValue();
 
-            TagResolver resolvers = TagResolver.builder()
+            // For the player item, we only need to resolve the rank.
+            // The player's name and balance will be handled by the new PAPI placeholders.
+            // Note: We will need to change the player-item lore in gui.yml to use PAPI placeholders for this to work.
+            // e.g. lore: - "<white>Balance: <gold>%kartaemerald_top_{rank}_balance_formatted%</gold>"
+            // This is not ideal, as PAPI placeholders are resolved relative to the VIEWING player, not the player in the skull.
+            // A better approach is to resolve them manually.
+            String playerName = offlinePlayer.getName() != null ? offlinePlayer.getName() : "Unknown";
+            String formattedBalance = plugin.getService().getFormatter().formatWithCommas(entry.getValue());
+
+            TagResolver itemResolver = TagResolver.builder()
                     .resolver(MessageUtil.placeholder("rank", rank.getAndIncrement()))
                     .resolver(MessageUtil.placeholder("player_name", playerName))
-                    .resolver(MessageUtil.placeholder("balance", plugin.getService().getFormatter().formatWithCommas(balance)))
+                    .resolver(MessageUtil.placeholder("balance", formattedBalance))
                     .build();
 
-            ItemStack item = createItem(playerItemConfig, resolvers);
+            ItemStack item = createItem(playerItemConfig, itemResolver);
             if (item.getItemMeta() instanceof SkullMeta) {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
                 meta.setOwningPlayer(offlinePlayer);
@@ -85,20 +94,19 @@ public class LeaderboardGui extends AbstractGui {
             inventory.setItem(i, item);
         }
 
-        // Navigation buttons
-        if (page > 0) {
-            inventory.setItem(guiConfig.getInt("previous-page.slot", 45), createItem(guiConfig.getConfigurationSection("previous-page")));
-        }
-        if (page < maxPage - 1) {
-            inventory.setItem(guiConfig.getInt("next-page.slot", 53), createItem(guiConfig.getConfigurationSection("next-page")));
-        }
-
-        // Page info
-        TagResolver pageResolvers = TagResolver.builder()
+        // Navigation and page info
+        TagResolver pageInfoResolver = TagResolver.builder()
                 .resolver(MessageUtil.placeholder("page", page + 1))
                 .resolver(MessageUtil.placeholder("max_page", maxPage))
                 .build();
-        inventory.setItem(guiConfig.getInt("page-info.slot", 49), createItem(guiConfig.getConfigurationSection("page-info"), pageResolvers));
+
+        if (page > 0) {
+            inventory.setItem(guiConfig.getInt("previous-page.slot", 45), createItem(guiConfig.getConfigurationSection("previous-page"), pageInfoResolver));
+        }
+        if (page < maxPage - 1) {
+            inventory.setItem(guiConfig.getInt("next-page.slot", 53), createItem(guiConfig.getConfigurationSection("next-page"), pageInfoResolver));
+        }
+        inventory.setItem(guiConfig.getInt("page-info.slot", 49), createItem(guiConfig.getConfigurationSection("page-info"), pageInfoResolver));
 
         fill(guiConfig);
         player.openInventory(inventory);
@@ -117,7 +125,13 @@ public class LeaderboardGui extends AbstractGui {
                 new LeaderboardGui(plugin, player, page - 1).open();
             }
         } else if (clickedSlot == guiConfig.getInt("next-page.slot", 53)) {
-            new LeaderboardGui(plugin, player, page + 1).open();
+            // Recalculate max page before moving to next
+             plugin.getService().getAccountCount().thenAccept(totalAccounts -> {
+                int maxPage = (int) Math.ceil((double) totalAccounts / ENTRIES_PER_PAGE);
+                if (page < maxPage - 1) {
+                    plugin.getServer().getScheduler().runTask(plugin, () -> new LeaderboardGui(plugin, player, page + 1).open());
+                }
+            });
         }
     }
 }

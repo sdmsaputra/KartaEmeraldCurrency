@@ -1,7 +1,8 @@
 # KartaEmeraldCurrency - GUI Configuration
 # Customize the layout and items of all interactive menus here.
 # All 'name' and 'lore' fields support MiniMessage format.
-# Use {placeholders} to insert dynamic data.
+# Global placeholders use the %placeholder% format (e.g., %player_name%).
+# Context-specific placeholders use the {placeholder} format (e.g., {amount}).
 
 main-menu:
   title: "<green>Karta Emerald Currency</green>"
@@ -13,15 +14,15 @@ main-menu:
     balance-info:
       slot: 4
       material: PLAYER_HEAD
-      # Use {player_name} for the player's head
+      # Use %player_name% for the player's head
       name: "<gold>Your Account</gold>"
       lore:
-        - "<gray>Player: <white>{player_name}</white></gray>"
+        - "<gray>Player: <white>%player_name%</white></gray>"
         - ""
-        - "<white>Bank: <gold>{balance_bank}</gold></white>"
-        - "<white>Wallet: <gold>{balance_wallet}</gold></white>"
+        - "<white>Bank: <gold>%kartaemerald_balance_bank_formatted%</gold></white>"
+        - "<white>Wallet: <gold>%kartaemerald_balance_wallet_formatted%</gold></white>"
         - ""
-        - "<green>Total: {balance_total}</green>"
+        - "<green>Total: %kartaemerald_balance_total_formatted%</green>"
     bank-access:
       slot: 11
       material: IRON_DOOR
@@ -65,9 +66,9 @@ bank-menu:
     balance-info:
       slot: 4
       material: EMERALD
-      name: "<gold>Bank Balance: {balance_bank}</gold>"
+      name: "<gold>Bank Balance: %kartaemerald_balance_bank_formatted%</gold>"
       lore:
-        - "<gray>Your wallet contains {balance_wallet} emeralds.</gray>"
+        - "<gray>Your wallet contains %kartaemerald_balance_wallet_formatted% emeralds.</gray>"
     deposit-custom:
       slot: 20
       material: CHEST
@@ -98,7 +99,7 @@ bank-menu:
       material: BARRIER
       name: "<red>Close</red>"
   quick-deposit-slots: [38, 39, 40, 41, 42]
-  quick-withdraw-slots: [3, 4, 5, 6, 7] # Example, might need better placement
+  quick-withdraw-slots: [3, 2, 1, 0, 4] # Adjusted for better layout
   quick-deposit-item:
     material: LIME_STAINED_GLASS_PANE
     name: "<green>Deposit {amount}</green>"
@@ -107,7 +108,7 @@ bank-menu:
     name: "<red>Withdraw {amount}</red>"
 
 leaderboard-menu:
-  title: "<aqua>Top Players</aqua>"
+  title: "<aqua>Top Players - Page {page}</aqua>"
   size: 54
   fill-item:
     material: BLACK_STAINED_GLASS_PANE
@@ -122,6 +123,8 @@ leaderboard-menu:
     slot: 45
     material: ARROW
     name: "<gray>Previous Page</gray>"
+    lore:
+      - "<white>Page {page}/{max_page}</white>"
   page-info:
     slot: 49
     material: BOOK
@@ -130,3 +133,5 @@ leaderboard-menu:
     slot: 53
     material: ARROW
     name: "<gray>Next Page</gray>"
+    lore:
+      - "<white>Page {page}/{max_page}</white>"

@@ -41,6 +41,8 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
     private DatabaseManager databaseManager;
     private ChatInputManager chatInputManager;
 
+    private static boolean papiHooked = false;
+
     private FileConfiguration messagesConfig;
     private FileConfiguration guiConfig;
     private FileConfiguration databaseConfig;
@@ -161,9 +163,11 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
         // Hook into PlaceholderAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            papiHooked = true;
             new com.minekarta.kec.placeholder.KecPlaceholderExpansion(this).register();
             getLogger().info("Successfully hooked into PlaceholderAPI.");
         } else {
+            papiHooked = false;
             getLogger().info("PlaceholderAPI not found. No placeholders will be available.");
         }
     }
@@ -230,5 +234,13 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
      */
     public ChatInputManager getChatInputManager() {
         return chatInputManager;
+    }
+
+    /**
+     * Checks if PlaceholderAPI is hooked.
+     * @return True if hooked, false otherwise.
+     */
+    public static boolean isPlaceholderApiHooked() {
+        return papiHooked;
     }
 }
