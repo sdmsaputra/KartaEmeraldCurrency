@@ -64,6 +64,7 @@ public interface Storage {
      * Creates an account for a player, usually with a default starting balance.
      *
      * @param uuid The UUID of the player.
+     * @param startingBalance The initial balance for the account.
      * @return A CompletableFuture that completes when the account is created.
      */
     CompletableFuture<Void> createAccount(@NotNull UUID uuid, long startingBalance);

@@ -21,6 +21,15 @@ public class CurrencyBalanceChangeEvent extends Event implements Cancellable {
     private final long from;
     private long to;
 
+    /**
+     * Constructs a new CurrencyBalanceChangeEvent.
+     *
+     * @param isAsync Whether the event is asynchronous.
+     * @param playerId The UUID of the player.
+     * @param reason The reason for the change.
+     * @param from The original balance.
+     * @param to The new balance.
+     */
     public CurrencyBalanceChangeEvent(boolean isAsync, @NotNull UUID playerId, @NotNull ChangeReason reason, long from, long to) {
         super(isAsync);
         this.playerId = playerId;
@@ -88,6 +97,10 @@ public class CurrencyBalanceChangeEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    /**
+     * Gets the handler list for this event.
+     * @return The handler list.
+     */
     @NotNull
     public static HandlerList getHandlerList() {
         return handlers;
@@ -97,14 +110,41 @@ public class CurrencyBalanceChangeEvent extends Event implements Cancellable {
      * Represents the cause of the balance change.
      */
     public enum ChangeReason {
+        /**
+         * Balance set by an administrator.
+         */
         ADMIN_SET,
+        /**
+         * Balance increased by an administrator.
+         */
         ADMIN_ADD,
+        /**
+         * Balance decreased by an administrator.
+         */
         ADMIN_REMOVE,
+        /**
+         * Balance changed due to a deposit.
+         */
         DEPOSIT,
+        /**
+         * Balance changed due to a withdrawal.
+         */
         WITHDRAW,
+        /**
+         * Balance changed due to sending a transfer.
+         */
         TRANSFER_SEND,
+        /**
+         * Balance changed due to receiving a transfer.
+         */
         TRANSFER_RECEIVE,
+        /**
+         * Balance changed by another plugin via the API.
+         */
         PLUGIN_API,
+        /**
+         * Balance changed for another reason.
+         */
         OTHER
     }
 }

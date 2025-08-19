@@ -24,6 +24,16 @@ public class CurrencyTransferEvent extends Event implements Cancellable {
     private long amount;
     private long fee;
 
+    /**
+     * Constructs a new CurrencyTransferEvent.
+     *
+     * @param isAsync Whether the event is asynchronous.
+     * @param from The UUID of the sender.
+     * @param to The UUID of the receiver.
+     * @param reason The reason for the transfer.
+     * @param amount The amount to transfer.
+     * @param fee The fee for the transfer.
+     */
     public CurrencyTransferEvent(boolean isAsync, @NotNull UUID from, @NotNull UUID to, @Nullable TransferReason reason, long amount, long fee) {
         super(isAsync);
         this.from = from;
@@ -116,6 +126,10 @@ public class CurrencyTransferEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    /**
+     * Gets the handler list for this event.
+     * @return The handler list.
+     */
     @NotNull
     public static HandlerList getHandlerList() {
         return handlers;

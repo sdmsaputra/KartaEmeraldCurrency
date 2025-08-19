@@ -16,11 +16,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Handles the /emerald command.
+ */
 public class EmeraldCommand implements CommandExecutor, TabCompleter {
 
     private final KartaEmeraldCurrencyPlugin plugin;
     private final KartaEmeraldService service;
 
+    /**
+     * Constructs a new EmeraldCommand.
+     * @param plugin The plugin instance.
+     */
     public EmeraldCommand(KartaEmeraldCurrencyPlugin plugin) {
         this.plugin = plugin;
         this.service = plugin.getService();

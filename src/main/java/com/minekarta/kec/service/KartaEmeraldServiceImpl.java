@@ -24,12 +24,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * The implementation of the KartaEmeraldService.
+ */
 public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
     private final KartaEmeraldCurrencyPlugin plugin;
     private final Storage storage;
     private final CurrencyFormatter formatter = new Formatter();
 
+    /**
+     * Constructs a new KartaEmeraldServiceImpl.
+     * @param plugin The plugin instance.
+     * @param storage The storage implementation.
+     */
     public KartaEmeraldServiceImpl(KartaEmeraldCurrencyPlugin plugin, Storage storage) {
         this.plugin = plugin;
         this.storage = storage;

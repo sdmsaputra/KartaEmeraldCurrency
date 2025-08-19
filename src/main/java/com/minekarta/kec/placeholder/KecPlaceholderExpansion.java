@@ -6,11 +6,18 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The PlaceholderAPI expansion for KartaEmeraldCurrency.
+ */
 public class KecPlaceholderExpansion extends PlaceholderExpansion {
 
     private final KartaEmeraldCurrencyPlugin plugin;
     private final KartaEmeraldService service;
 
+    /**
+     * Constructs a new KecPlaceholderExpansion.
+     * @param plugin The plugin instance.
+     */
     public KecPlaceholderExpansion(KartaEmeraldCurrencyPlugin plugin) {
         this.plugin = plugin;
         this.service = plugin.getService();
