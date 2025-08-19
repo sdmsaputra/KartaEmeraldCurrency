@@ -8,11 +8,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +32,9 @@ public class KecPlaceholderExpansion extends PlaceholderExpansion {
     private final String placeholderSource;
     private final boolean compactFormatting;
 
+    private final Cache<UUID, Long> balanceCache;
+    private final Cache<String, Map<UUID, Long>> leaderboardCache;
+
     private static final Pattern LEADERBOARD_PATTERN = Pattern.compile("top_(\\d+)_(\\w+)");
 
     /**
@@ -40,6 +47,16 @@ public class KecPlaceholderExpansion extends PlaceholderExpansion {
         this.formatter = service.getFormatter();
         this.placeholderSource = plugin.getConfig().getString("placeholders.source", "BANK").toUpperCase();
         this.compactFormatting = plugin.getConfig().getBoolean("placeholders.compact", false);
+
+        this.balanceCache = CacheBuilder.newBuilder()
+                .maximumSize(500)
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .build();
+
+        this.leaderboardCache = CacheBuilder.newBuilder()
+                .maximumSize(2)
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .build();
     }
 
     @Override
@@ -68,65 +85,89 @@ public class KecPlaceholderExpansion extends PlaceholderExpansion {
             return "";
         }
 
+        // Leaderboard placeholders
+        Matcher matcher = LEADERBOARD_PATTERN.matcher(params);
+        if (matcher.matches()) {
+            return handleLeaderboardPlaceholder(matcher);
+        }
+
         // Balance placeholders
+        Long balance = balanceCache.getIfPresent(player.getUniqueId());
+
+        // If balance is not in cache, request it and return a default value
+        if (balance == null) {
+            // Request the balance asynchronously and populate the cache
+            getBalance(player).thenAccept(b -> balanceCache.put(player.getUniqueId(), b));
+            // Return a default value while the balance is being fetched
+            return "0";
+        }
+
         switch (params) {
             case "balance":
-                return String.valueOf(getBalance(player).join());
+                return String.valueOf(balance);
             case "balance_formatted":
-                return formatBalance(getBalance(player).join());
+                return formatBalance(balance);
             case "balance_bank":
-                return String.valueOf(service.getBankBalance(player.getUniqueId()).join());
+                // This will now use the cached value based on 'placeholderSource'
+                return String.valueOf(balance);
             case "balance_bank_formatted":
-                return formatter.formatWithCommas(service.getBankBalance(player.getUniqueId()).join());
+                return formatter.formatWithCommas(balance);
             case "balance_wallet":
+                // Wallet balance is synchronous and fast, no need to cache
                 return String.valueOf(service.getWalletBalance(player));
             case "balance_wallet_formatted":
                 return formatter.formatWithCommas(service.getWalletBalance(player));
             case "balance_total":
-                return String.valueOf(getTotalBalance(player).join());
+                // This will now use the cached value based on 'placeholderSource'
+                return String.valueOf(balance);
             case "balance_total_formatted":
-                return formatter.formatWithCommas(getTotalBalance(player).join());
-        }
-
-        // Leaderboard placeholders
-        Matcher matcher = LEADERBOARD_PATTERN.matcher(params);
-        if (matcher.matches()) {
-            try {
-                int rank = Integer.parseInt(matcher.group(1));
-                if (rank <= 0) return "Invalid Rank";
-
-                String type = matcher.group(2);
-
-                // Fetch top balances - we fetch one more than needed in case of rank lookup
-                Map<UUID, Long> topBalances = service.getTopBalances(rank, 0).join();
-                if (topBalances.size() < rank) {
-                    return ""; // or a default value like "N/A"
-                }
-
-                // Convert map to list to get by index
-                List<Map.Entry<UUID, Long>> entries = new ArrayList<>(topBalances.entrySet());
-                Map.Entry<UUID, Long> entry = entries.get(rank - 1);
-
-                switch (type) {
-                    case "name":
-                        OfflinePlayer topPlayer = Bukkit.getOfflinePlayer(entry.getKey());
-                        return topPlayer.getName() != null ? topPlayer.getName() : "Unknown";
-                    case "balance":
-                        return String.valueOf(entry.getValue());
-                    case "balance_formatted":
-                        return formatter.formatWithCommas(entry.getValue());
-                    default:
-                        return "Invalid Type";
-                }
-
-            } catch (NumberFormatException e) {
-                return "Invalid Rank Number";
-            } catch (IndexOutOfBoundsException e) {
-                return ""; // Rank doesn't exist
-            }
+                return formatter.formatWithCommas(balance);
         }
 
         return null;
+    }
+
+    private String handleLeaderboardPlaceholder(Matcher matcher) {
+        try {
+            int rank = Integer.parseInt(matcher.group(1));
+            if (rank <= 0) return "Invalid Rank";
+
+            String type = matcher.group(2);
+            String leaderboardKey = "TOTAL".equals(placeholderSource) ? "TOTAL" : "BANK";
+
+            Map<UUID, Long> topBalances = leaderboardCache.getIfPresent(leaderboardKey);
+
+            if (topBalances == null) {
+                // Fetch asynchronously and populate cache
+                service.getTopBalances(50, 0).thenAccept(balances -> leaderboardCache.put(leaderboardKey, balances));
+                return ""; // Return empty while loading
+            }
+
+            if (topBalances.size() < rank) {
+                return ""; // or a default value like "N/A"
+            }
+
+            // Convert map to list to get by index
+            List<Map.Entry<UUID, Long>> entries = new ArrayList<>(topBalances.entrySet());
+            Map.Entry<UUID, Long> entry = entries.get(rank - 1);
+
+            switch (type) {
+                case "name":
+                    OfflinePlayer topPlayer = Bukkit.getOfflinePlayer(entry.getKey());
+                    return topPlayer.getName() != null ? topPlayer.getName() : "Unknown";
+                case "balance":
+                    return String.valueOf(entry.getValue());
+                case "balance_formatted":
+                    return formatter.formatWithCommas(entry.getValue());
+                default:
+                    return "Invalid Type";
+            }
+
+        } catch (NumberFormatException e) {
+            return "Invalid Rank Number";
+        } catch (IndexOutOfBoundsException e) {
+            return ""; // Rank doesn't exist
+        }
     }
 
     private CompletableFuture<Long> getBalance(OfflinePlayer player) {
