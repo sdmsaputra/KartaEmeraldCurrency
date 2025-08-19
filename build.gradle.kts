@@ -53,9 +53,6 @@ tasks {
         relocate("com.zaxxer.hikari", "com.minekarta.kec.libs.hikaricp")
         relocate("net.kyori.adventure", "com.minekarta.kec.libs.adventure")
         relocate("org.h2", "com.minekarta.kec.libs.h2")
-
-        // Minimize the JAR file by removing unnecessary files
-        minimize()
     }
 
     // Set shadowJar as the default build task
