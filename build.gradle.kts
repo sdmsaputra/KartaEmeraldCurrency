@@ -36,7 +36,7 @@ dependencies {
     // Implementation Dependencies (to be shaded)
     implementation("com.zaxxer:HikariCP:${properties.getProperty("hikariVersion")}")
     implementation("net.kyori:adventure-text-minimessage:${properties.getProperty("miniMessageVersion")}")
-    implementation("org.xerial:sqlite-jdbc:${properties.getProperty("sqliteDriverVersion")}")
+    implementation("com.h2database:h2:${properties.getProperty("h2DriverVersion")}")
 }
 
 tasks {
@@ -52,7 +52,7 @@ tasks {
         archiveClassifier.set("") // Produce a single jar without the '-all' suffix
         relocate("com.zaxxer.hikari", "com.minekarta.kec.libs.hikaricp")
         relocate("net.kyori.adventure", "com.minekarta.kec.libs.adventure")
-        relocate("org.sqlite", "com.minekarta.kec.libs.sqlite")
+        relocate("org.h2", "com.minekarta.kec.libs.h2")
 
         // Minimize the JAR file by removing unnecessary files
         minimize()
