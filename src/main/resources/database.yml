@@ -1,0 +1,29 @@
+# KartaEmeraldCurrency - Database Configuration
+
+# The type of storage to use for player data.
+# Supported types: SQLITE, MYSQL
+storage:
+  type: SQLITE
+
+# Configuration for SQLite.
+# This is a file-based database, ideal for small to medium servers.
+sqlite:
+  # The name of the database file. It will be created in the plugin's data folder.
+  file: "kec-data.db"
+
+# Configuration for MySQL.
+# Recommended for large servers or networks.
+mysql:
+  host: "localhost"
+  port: 3306
+  database: "karta_emerald_currency"
+  username: "root"
+  password: "password"
+  use-ssl: false
+  pool:
+    # Maximum number of connections in the pool.
+    maximumPoolSize: 10
+    # Minimum number of idle connections to maintain.
+    minimumIdle: 2
+    # How long to wait for a connection before timing out (in milliseconds).
+    connectionTimeoutMs: 10000
