@@ -22,9 +22,9 @@ public class DatabaseManager {
      */
     public enum StorageType {
         /**
-         * Use SQLite for data storage.
+         * Use H2 for data storage.
          */
-        SQLITE,
+        H2,
         /**
          * Use MySQL for data storage.
          */
@@ -42,13 +42,13 @@ public class DatabaseManager {
         HikariConfig config = new HikariConfig();
 
         switch (type) {
-            case SQLITE:
-                String dbFileName = dbProps.getProperty("sqlite.file", "kec-data.db");
+            case H2:
+                String dbFileName = dbProps.getProperty("h2.file", "kec-data.db");
                 File dbFile = dataFolderPath.resolve(dbFileName).toFile();
                 if (!dbFile.getParentFile().exists()) {
                     dbFile.getParentFile().mkdirs();
                 }
-                config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
+                config.setJdbcUrl("jdbc:h2:" + dbFile.getAbsolutePath());
                 break;
 
             case MYSQL:

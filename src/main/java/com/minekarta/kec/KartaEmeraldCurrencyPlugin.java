@@ -7,7 +7,7 @@ import com.minekarta.kec.service.KartaEmeraldServiceImpl;
 import com.minekarta.kec.storage.DatabaseManager;
 import com.minekarta.kec.util.MessageUtil;
 import com.minekarta.kec.storage.MySqlStorage;
-import com.minekarta.kec.storage.SqliteStorage;
+import com.minekarta.kec.storage.H2Storage;
 import com.minekarta.kec.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -103,20 +103,20 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
     }
 
     private boolean setupStorage() {
-        String storageTypeStr = databaseConfig.getString("storage.type", "SQLITE").toUpperCase();
+        String storageTypeStr = databaseConfig.getString("storage.type", "H2").toUpperCase();
         DatabaseManager.StorageType storageType;
         try {
             storageType = DatabaseManager.StorageType.valueOf(storageTypeStr);
         } catch (IllegalArgumentException e) {
-            getLogger().severe("Invalid storage type '" + storageTypeStr + "' in database.yml. Defaulting to SQLITE.");
-            storageType = DatabaseManager.StorageType.SQLITE;
+            getLogger().severe("Invalid storage type '" + storageTypeStr + "' in database.yml. Defaulting to H2.");
+            storageType = DatabaseManager.StorageType.H2;
         }
 
         Properties dbProps = new Properties();
         if (storageType == DatabaseManager.StorageType.MYSQL) {
             databaseConfig.getConfigurationSection("mysql").getValues(true).forEach((key, value) -> dbProps.setProperty("mysql." + key, value.toString()));
-        } else {
-            databaseConfig.getConfigurationSection("sqlite").getValues(true).forEach((key, value) -> dbProps.setProperty("sqlite." + key, value.toString()));
+        } else { // H2
+            databaseConfig.getConfigurationSection("h2").getValues(true).forEach((key, value) -> dbProps.setProperty("h2." + key, value.toString()));
         }
 
         try {
@@ -125,8 +125,8 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
             if (storageType == DatabaseManager.StorageType.MYSQL) {
                 this.storage = new MySqlStorage(databaseManager, asyncExecutor);
-            } else {
-                this.storage = new SqliteStorage(databaseManager, asyncExecutor);
+            } else { // H2
+                this.storage = new H2Storage(databaseManager, asyncExecutor);
             }
 
             this.storage.initialize().join(); // Wait for table creation on startup

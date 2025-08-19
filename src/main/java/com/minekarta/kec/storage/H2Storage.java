@@ -12,9 +12,9 @@ import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 /**
- * A SQLite implementation of the {@link Storage} interface.
+ * A H2 implementation of the {@link Storage} interface.
  */
-public class SqliteStorage implements Storage {
+public class H2Storage implements Storage {
 
     private final DatabaseManager dbManager;
     private final Executor asyncExecutor;
@@ -27,28 +27,32 @@ public class SqliteStorage implements Storage {
             );""";
 
     private static final String GET_BALANCE = "SELECT balance FROM kec_accounts WHERE uuid = ?;";
-    private static final String UPSERT_BALANCE = """
-            INSERT INTO kec_accounts (uuid, balance) VALUES (?, ?)
-            ON CONFLICT(uuid) DO UPDATE SET balance = excluded.balance, updated_at = CURRENT_TIMESTAMP;
-            """;
+    private static final String UPSERT_BALANCE = "MERGE INTO kec_accounts (uuid, balance, updated_at) KEY(uuid) VALUES (?, ?, CURRENT_TIMESTAMP);";
     private static final String ACCOUNT_EXISTS = "SELECT 1 FROM kec_accounts WHERE uuid = ?;";
+
     private static final String ADD_BALANCE = """
-            INSERT INTO kec_accounts (uuid, balance) VALUES (?, ?)
-            ON CONFLICT(uuid) DO UPDATE SET balance = balance + excluded.balance, updated_at = CURRENT_TIMESTAMP;
+            MERGE INTO kec_accounts t
+            USING (VALUES(?, ?)) AS s(uuid, balance)
+            ON t.uuid = s.uuid
+            WHEN MATCHED THEN UPDATE SET t.balance = t.balance + s.balance, t.updated_at = CURRENT_TIMESTAMP
+            WHEN NOT MATCHED THEN INSERT (uuid, balance) VALUES (s.uuid, s.balance);
             """;
     private static final String REMOVE_BALANCE = """
-            INSERT INTO kec_accounts (uuid, balance) VALUES (?, 0)
-            ON CONFLICT(uuid) DO UPDATE SET balance = balance - ?, updated_at = CURRENT_TIMESTAMP;
+            MERGE INTO kec_accounts t
+            USING (VALUES(?, ?)) AS s(uuid, amount)
+            ON t.uuid = s.uuid
+            WHEN MATCHED THEN UPDATE SET t.balance = t.balance - s.amount, t.updated_at = CURRENT_TIMESTAMP
+            WHEN NOT MATCHED THEN INSERT (uuid, balance) VALUES (s.uuid, 0);
             """;
 
 
     /**
-     * Constructs a new SqliteStorage.
+     * Constructs a new H2Storage.
      *
      * @param dbManager The database manager.
      * @param asyncExecutor The executor for async tasks.
      */
-    public SqliteStorage(DatabaseManager dbManager, Executor asyncExecutor) {
+    public H2Storage(DatabaseManager dbManager, Executor asyncExecutor) {
         this.dbManager = dbManager;
         this.asyncExecutor = asyncExecutor;
     }
@@ -68,7 +72,7 @@ public class SqliteStorage implements Storage {
                  PreparedStatement ps = conn.prepareStatement(CREATE_ACCOUNTS_TABLE)) {
                 ps.execute();
             } catch (SQLException e) {
-                throw new RuntimeException("Failed to initialize SQLite database", e);
+                throw new RuntimeException("Failed to initialize H2 database", e);
             }
         });
     }
@@ -125,7 +129,7 @@ public class SqliteStorage implements Storage {
 
     @Override
     public CompletableFuture<Void> createAccount(@NotNull UUID uuid, long startingBalance) {
-        return setBalance(uuid, startingBalance); // UPSERT handles creation
+        return setBalance(uuid, startingBalance); // MERGE handles creation
     }
 
     @Override
@@ -163,11 +167,13 @@ public class SqliteStorage implements Storage {
     public CompletableFuture<Boolean> performTransfer(@NotNull UUID from, @NotNull UUID to, long amount, long fee) {
         return supplyAsync(() -> {
             long totalDeduction = amount + fee;
-            try (Connection conn = dbManager.getDataSource().getConnection()) {
+            Connection conn = null;
+            try {
+                conn = dbManager.getDataSource().getConnection();
                 conn.setAutoCommit(false);
 
                 // Check sender's balance
-                try (PreparedStatement checkPs = conn.prepareStatement("SELECT balance FROM kec_accounts WHERE uuid = ?")) {
+                try (PreparedStatement checkPs = conn.prepareStatement("SELECT balance FROM kec_accounts WHERE uuid = ? FOR UPDATE")) {
                     checkPs.setString(1, from.toString());
                     ResultSet rs = checkPs.executeQuery();
                     if (!rs.next() || rs.getLong("balance") < totalDeduction) {
@@ -184,6 +190,7 @@ public class SqliteStorage implements Storage {
                 }
 
                 // Add to receiver
+                // Using MERGE to handle case where receiver might not have an account yet
                 try (PreparedStatement addPs = conn.prepareStatement(ADD_BALANCE)) {
                     addPs.setString(1, to.toString());
                     addPs.setLong(2, amount);
@@ -194,9 +201,20 @@ public class SqliteStorage implements Storage {
                 return true;
 
             } catch (SQLException e) {
-                // In case of error, the whole transaction should be rolled back.
-                // try-with-resources on Connection should handle this if autocommit is false, but explicit rollback is safer.
+                try {
+                    if (conn != null) conn.rollback();
+                } catch (SQLException ex) {
+                    e.addSuppressed(ex);
+                }
                 throw new RuntimeException("Failed to perform transfer", e);
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        // In a real app, you'd log this exception.
+                    }
+                }
             }
         });
     }

@@ -1,13 +1,13 @@
 # KartaEmeraldCurrency - Database Configuration
 
 # The type of storage to use for player data.
-# Supported types: SQLITE, MYSQL
+# Supported types: H2, MYSQL
 storage:
-  type: SQLITE
+  type: H2
 
-# Configuration for SQLite.
+# Configuration for H2.
 # This is a file-based database, ideal for small to medium servers.
-sqlite:
+h2:
   # The name of the database file. It will be created in the plugin's data folder.
   file: "kec-data.db"
 
