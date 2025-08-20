@@ -2,12 +2,13 @@ package com.minekarta.kec.gui;
 
 import com.minekarta.kec.KartaEmeraldCurrencyPlugin;
 import com.minekarta.kec.util.MessageUtil;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +62,7 @@ public class ChatInputManager implements Listener {
      * @param event The chat event.
      */
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
 
@@ -69,7 +70,7 @@ public class ChatInputManager implements Listener {
             event.setCancelled(true);
 
             TransactionType type = pendingTransactions.remove(playerUuid);
-            String message = event.getMessage();
+            String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
             if (message.equalsIgnoreCase("cancel")) {
                 MessageUtil.sendMessage(player, "chat-input-cancelled");
