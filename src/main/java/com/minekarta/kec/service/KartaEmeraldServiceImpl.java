@@ -8,7 +8,7 @@ import com.minekarta.kec.api.event.BankDepositEvent;
 import com.minekarta.kec.api.event.BankWithdrawEvent;
 import com.minekarta.kec.api.event.CurrencyBalanceChangeEvent;
 import com.minekarta.kec.api.event.CurrencyTransferEvent;
-import com.minekarta.kec.storage.Storage;
+import com.minekarta.kec.storage.EconomyDataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -30,35 +29,33 @@ import java.util.concurrent.CompletableFuture;
 public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
     private final KartaEmeraldCurrencyPlugin plugin;
-    private final Storage storage;
+    private final EconomyDataHandler economyDataHandler;
     private final CurrencyFormatter formatter = new Formatter();
 
     /**
      * Constructs a new KartaEmeraldServiceImpl.
      * @param plugin The plugin instance.
-     * @param storage The storage implementation.
+     * @param economyDataHandler The economy data handler.
      */
-    public KartaEmeraldServiceImpl(KartaEmeraldCurrencyPlugin plugin, Storage storage) {
+    public KartaEmeraldServiceImpl(KartaEmeraldCurrencyPlugin plugin, EconomyDataHandler economyDataHandler) {
         this.plugin = plugin;
-        this.storage = storage;
+        this.economyDataHandler = economyDataHandler;
     }
 
     @Override
     public CompletableFuture<Boolean> hasAccount(@NotNull UUID playerId) {
-        return storage.hasAccount(playerId);
+        return economyDataHandler.hasAccount(playerId);
     }
 
     @Override
     public CompletableFuture<Void> createAccount(@NotNull UUID playerId) {
-        // In our storage impl, setBalance/addBalance will create an account if it doesn't exist.
-        // We can just set the starting balance.
         long startingBalance = plugin.getPluginConfig().getLong("currency.starting-bank-balance", 0);
-        return storage.createAccount(playerId, startingBalance);
+        return economyDataHandler.createAccount(playerId, startingBalance);
     }
 
     @Override
     public CompletableFuture<Long> getBankBalance(@NotNull UUID playerId) {
-        return storage.getBalance(playerId);
+        return economyDataHandler.getBalance(playerId);
     }
 
     @Override
@@ -84,10 +81,8 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
             return CompletableFuture.completedFuture(false);
         }
 
-        // We need to do sync stuff on the main thread, and return a future that can be used for composition.
         CompletableFuture<Long> syncPart = new CompletableFuture<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
-            // This is on the main thread
             try {
                 BankDepositEvent event = new BankDepositEvent(player, amount);
                 Bukkit.getPluginManager().callEvent(event);
@@ -111,10 +106,8 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
         });
 
         return syncPart.thenCompose(finalAmount -> {
-            // This is on an async thread
-            return storage.addBalance(playerId, finalAmount).thenApply(newBalance -> {
+            return economyDataHandler.addBalance(playerId, finalAmount).thenApply(newBalance -> {
                 long oldBalance = newBalance - finalAmount;
-                // Fire event on main thread
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.DEPOSIT, oldBalance, newBalance);
                     Bukkit.getPluginManager().callEvent(changeEvent);
@@ -136,10 +129,9 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
         return getBankBalance(playerId).thenCompose(balance -> {
             if (balance < amount) {
-                return CompletableFuture.completedFuture(false); // Insufficient funds
+                return CompletableFuture.completedFuture(false);
             }
 
-            // We need to do sync stuff on the main thread, and return a future that can be used for composition.
             CompletableFuture<Long> syncPart = new CompletableFuture<>();
             Bukkit.getScheduler().runTask(plugin, () -> {
                 try {
@@ -152,15 +144,11 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
                     long finalAmount = event.getAmount();
                     if (balance < finalAmount) {
-                        // Check again in case the event changed the amount
                         syncPart.completeExceptionally(new RuntimeException("Insufficient funds after event modification."));
                         return;
                     }
 
-                    Material currencyMaterial = Material.valueOf(plugin.getPluginConfig().getString("currency.material", "EMERALD"));
                     if (player.getInventory().firstEmpty() == -1) {
-                        // This is a basic check. A more robust check would be to see if the inventory can hold the items.
-                        // For now, we'll keep the existing logic.
                         syncPart.completeExceptionally(new RuntimeException("Player inventory is full."));
                         return;
                     }
@@ -171,14 +159,12 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
             });
 
             return syncPart.thenCompose(finalAmount -> {
-                // This is on an async thread
-                return storage.removeBalance(playerId, finalAmount).thenApply(newBalance -> {
-                    // Give items and fire event on main thread
+                return economyDataHandler.removeBalance(playerId, finalAmount).thenApply(newBalance -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Material currencyMaterial = Material.valueOf(plugin.getPluginConfig().getString("currency.material", "EMERALD"));
                         player.getInventory().addItem(new ItemStack(currencyMaterial, (int) (long)finalAmount));
 
-                        long oldBalance = balance; // from the initial getBankBalance call
+                        long oldBalance = balance;
                         CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.WITHDRAW, oldBalance, newBalance);
                         Bukkit.getPluginManager().callEvent(changeEvent);
                     });
@@ -198,7 +184,7 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
                 return CompletableFuture.completedFuture(false);
             }
 
-            CurrencyTransferEvent event = new CurrencyTransferEvent(true, from, to, reason, amount, 0); // Assuming 0 fee for now
+            CurrencyTransferEvent event = new CurrencyTransferEvent(true, from, to, reason, amount, 0);
             Bukkit.getPluginManager().callEvent(event);
             if(event.isCancelled()) {
                 return CompletableFuture.completedFuture(false);
@@ -206,23 +192,23 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
             long finalAmount = event.getAmount();
 
-            return storage.performTransfer(from, to, finalAmount, event.getFee());
+            return economyDataHandler.performTransfer(from, to, finalAmount, event.getFee());
         });
     }
 
     @Override
     public CompletableFuture<Boolean> setBankBalance(@NotNull UUID playerId, long amount) {
-        return storage.setBalance(playerId, amount).thenApply(v -> true);
+        return economyDataHandler.setBalance(playerId, amount).thenApply(v -> true);
     }
 
     @Override
     public CompletableFuture<Boolean> addBankBalance(@NotNull UUID playerId, long delta) {
-        return storage.addBalance(playerId, delta).thenApply(newBalance -> true);
+        return economyDataHandler.addBalance(playerId, delta).thenApply(newBalance -> true);
     }
 
     @Override
     public CompletableFuture<Boolean> removeBankBalance(@NotNull UUID playerId, long delta) {
-        return storage.removeBalance(playerId, delta).thenApply(newBalance -> true);
+        return economyDataHandler.removeBalance(playerId, delta).thenApply(newBalance -> true);
     }
 
     @Override
@@ -233,12 +219,12 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
     @Override
     public CompletableFuture<Map<UUID, Long>> getTopBalances(int limit, int offset) {
-        return storage.getTopBalances(limit, offset);
+        return economyDataHandler.getTopBalances(limit, offset);
     }
 
     @Override
     public CompletableFuture<Integer> getAccountCount() {
-        return storage.getAccountCount();
+        return economyDataHandler.getAccountCount();
     }
 
     private static class Formatter implements CurrencyFormatter {
@@ -260,7 +246,6 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
 
         @Override
         public @NotNull String formatDefault(long amount) {
-            // This should read from config, but for now, we default to commas
             return formatWithCommas(amount);
         }
     }

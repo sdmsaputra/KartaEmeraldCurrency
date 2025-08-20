@@ -55,7 +55,6 @@ public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
 
         switch (subCommand) {
             case "reload" -> handleReload(sender);
-            // case "migrate" -> handleMigrate(sender, args);
             default -> MessageUtil.sendMessage(sender, "invalid-usage", MessageUtil.placeholder("usage", "/" + label + " help"));
         }
 
@@ -70,7 +69,7 @@ public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
         }
 
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
+        if (!target.hasPlayedBefore() && !target.isOnline()) {
              MessageUtil.sendMessage(sender, "player-not-found", MessageUtil.placeholder("player", args[1]));
             return;
         }
@@ -95,7 +94,6 @@ public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
                 MessageUtil.sendMessage(sender, "balance-add", MessageUtil.placeholder("player", target.getName()), MessageUtil.placeholder("amount", amount)));
             case "remove" -> service.removeBankBalance(targetId, amount).thenRun(() ->
                 MessageUtil.sendMessage(sender, "balance-remove", MessageUtil.placeholder("player", target.getName()), MessageUtil.placeholder("amount", amount)));
-            // TODO: give and take commands
         }
     }
 
@@ -104,10 +102,7 @@ public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
             MessageUtil.sendMessage(sender, "no-permission");
             return;
         }
-        // This is a simplified reload. A proper reload is much more complex.
-        plugin.reloadConfig();
-        // custom configs need manual reload
-        MessageUtil.load(plugin);
+        plugin.reload();
         MessageUtil.sendMessage(sender, "reload-success");
     }
 
@@ -115,12 +110,12 @@ public class EmeraldAdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("set", "add", "remove", "give", "take", "reload", "migrate").stream()
+            return Arrays.asList("set", "add", "remove", "reload").stream()
                     .filter(s -> sender.hasPermission("kec.admin." + s))
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
-        if (args.length == 2 && Arrays.asList("set", "add", "remove", "give", "take").contains(args[0].toLowerCase())) {
+        if (args.length == 2 && Arrays.asList("set", "add", "remove").contains(args[0].toLowerCase())) {
              return Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))

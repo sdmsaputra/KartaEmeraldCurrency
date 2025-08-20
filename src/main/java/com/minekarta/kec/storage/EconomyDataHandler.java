@@ -7,10 +7,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An interface for abstracting the data storage operations of the plugin.
+ * An interface for handling the economy data operations of the plugin.
+ * This acts as a bridge between the plugin's services and the underlying storage providers.
  * All operations are asynchronous and return a {@link CompletableFuture}.
  */
-public interface Storage {
+public interface EconomyDataHandler {
     /**
      * Retrieves a sorted list of top balances.
      *
