@@ -79,6 +79,10 @@ public class KecPlaceholderExpansion extends PlaceholderExpansion {
         return true;
     }
 
+    public void invalidateBalanceCache(UUID playerId) {
+        balanceCache.invalidate(playerId);
+    }
+
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) {
@@ -98,8 +102,8 @@ public class KecPlaceholderExpansion extends PlaceholderExpansion {
         if (balance == null) {
             // Request the balance asynchronously and populate the cache
             getBalance(player).thenAccept(b -> balanceCache.put(player.getUniqueId(), b));
-            // Return a default value while the balance is being fetched
-            return "0";
+            // Return null to let PlaceholderAPI know we don't have a value yet
+            return null;
         }
 
         switch (params) {

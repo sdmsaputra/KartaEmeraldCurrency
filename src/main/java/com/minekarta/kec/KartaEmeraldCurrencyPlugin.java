@@ -4,6 +4,7 @@ import com.minekarta.kec.api.KartaEmeraldService;
 import com.minekarta.kec.command.EmeraldAdminCommand;
 import com.minekarta.kec.command.EmeraldCommand;
 import com.minekarta.kec.gui.ChatInputManager;
+import com.minekarta.kec.placeholder.KecPlaceholderExpansion;
 import com.minekarta.kec.service.KartaEmeraldServiceImpl;
 import com.minekarta.kec.storage.DefaultEconomyDataHandler;
 import com.minekarta.kec.storage.EconomyDataHandler;
@@ -30,6 +31,7 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
     private EconomyDataHandler economyDataHandler;
     private KartaEmeraldService service;
     private ChatInputManager chatInputManager;
+    private KecPlaceholderExpansion placeholderExpansion;
 
     private static boolean papiHooked = false;
 
@@ -122,7 +124,8 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             papiHooked = true;
-            new com.minekarta.kec.placeholder.KecPlaceholderExpansion(this).register();
+            this.placeholderExpansion = new com.minekarta.kec.placeholder.KecPlaceholderExpansion(this);
+            this.placeholderExpansion.register();
             getLogger().info("Successfully hooked into PlaceholderAPI.");
         } else {
             papiHooked = false;
@@ -173,7 +176,9 @@ public class KartaEmeraldCurrencyPlugin extends JavaPlugin {
         return chatInputManager;
     }
 
-
+    public KecPlaceholderExpansion getPlaceholderExpansion() {
+        return placeholderExpansion;
+    }
 
     public static boolean isPlaceholderApiHooked() {
         return papiHooked;

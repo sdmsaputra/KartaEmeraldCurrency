@@ -112,6 +112,9 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
                     CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.DEPOSIT, oldBalance, newBalance);
                     Bukkit.getPluginManager().callEvent(changeEvent);
                 });
+                if (plugin.getPlaceholderExpansion() != null) {
+                    plugin.getPlaceholderExpansion().invalidateBalanceCache(playerId);
+                }
                 return true;
             });
         }).exceptionally(e -> {
@@ -169,6 +172,9 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
                         CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.WITHDRAW, oldBalance, newBalance);
                         Bukkit.getPluginManager().callEvent(changeEvent);
                     });
+                    if (plugin.getPlaceholderExpansion() != null) {
+                        plugin.getPlaceholderExpansion().invalidateBalanceCache(playerId);
+                    }
                     return true;
                 });
             });
