@@ -1,6 +1,24 @@
 # KartaEmeraldCurrency - General Configuration
 # For help, visit [link-to-docs]
 
+# Storage configuration
+# Choose your storage type. Can be YAML or MYSQL.
+# YAML is a simple file-based storage, good for small servers.
+# MYSQL is recommended for larger servers or multi-server networks.
+storage:
+  type: YAML
+  mysql:
+    host: "localhost"
+    port: "3306"
+    database: "karta_emerald"
+    username: "user"
+    password: "password"
+    use-ssl: false
+    pool:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout-ms: 10000
+
 currency:
   # The material to be used as physical currency. Must be a valid item material.
   material: EMERALD
