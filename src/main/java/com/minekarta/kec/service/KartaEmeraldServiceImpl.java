@@ -108,10 +108,13 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
         return syncPart.thenCompose(finalAmount -> {
             return economyDataHandler.addBalance(playerId, finalAmount).thenApply(newBalance -> {
                 long oldBalance = newBalance - finalAmount;
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                     CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.DEPOSIT, oldBalance, newBalance);
                     Bukkit.getPluginManager().callEvent(changeEvent);
                 });
+                if (plugin.getPlaceholderExpansion() != null) {
+                    plugin.getPlaceholderExpansion().invalidateBalanceCache(playerId);
+                }
                 return true;
             });
         }).exceptionally(e -> {
@@ -163,11 +166,15 @@ public class KartaEmeraldServiceImpl implements KartaEmeraldService {
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Material currencyMaterial = Material.valueOf(plugin.getPluginConfig().getString("currency.material", "EMERALD"));
                         player.getInventory().addItem(new ItemStack(currencyMaterial, (int) (long)finalAmount));
-
+                    });
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         long oldBalance = balance;
                         CurrencyBalanceChangeEvent changeEvent = new CurrencyBalanceChangeEvent(true, playerId, CurrencyBalanceChangeEvent.ChangeReason.WITHDRAW, oldBalance, newBalance);
                         Bukkit.getPluginManager().callEvent(changeEvent);
                     });
+                    if (plugin.getPlaceholderExpansion() != null) {
+                        plugin.getPlaceholderExpansion().invalidateBalanceCache(playerId);
+                    }
                     return true;
                 });
             });
