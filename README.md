@@ -63,7 +63,9 @@ Requires [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.624/
 - `%kartaemerald_bank%` - An alias for `%kartaemerald_balance%`.
 - `%kartaemerald_wallet%` - Player's physical emerald count in their inventory.
 - `%kartaemerald_top_<1-10>_name%` - **(Not yet implemented)** Name of the Nth player on the leaderboard.
-- `%kartaemerald_top_<1-10>_amount%` - **(Not yet implemented)** Balance of the Nth player on the leaderboard.
+- `%kartaemerald_top_<1-10>_amount%` - **(Not yet implemented)** Balance of the Nth player on a leaderboard.
+
+**Note on custom placeholders:** In configuration files (`gui.yml`, `messages.yml`), you can use context-specific placeholders. These use the `<placeholder_name>` format, which is compatible with the [MiniMessage](https://docs.adventure.kyori.net/minimessage/format.html#placeholder) library. For example, in the leaderboard GUI, you can use `<rank>`, `<player_name>`, and `<balance>`.
 
 ## Developer API
 
