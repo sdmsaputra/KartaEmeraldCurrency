@@ -102,36 +102,36 @@ bank-menu:
   quick-withdraw-slots: [3, 2, 1, 0, 4] # Adjusted for better layout
   quick-deposit-item:
     material: LIME_STAINED_GLASS_PANE
-    name: "<green>Deposit {amount}</green>"
+    name: "<green>Deposit <amount></green>"
   quick-withdraw-item:
     material: RED_STAINED_GLASS_PANE
-    name: "<red>Withdraw {amount}</red>"
+    name: "<red>Withdraw <amount></red>"
 
 leaderboard-menu:
-  title: "<aqua>Top Players - Page {page}</aqua>"
+  title: "<aqua>Top Players - Page <page></aqua>"
   size: 54
   fill-item:
     material: BLACK_STAINED_GLASS_PANE
     name: " "
   player-item:
     material: PLAYER_HEAD
-    name: "<green>#{rank} {player_name}</green>"
+    name: "<green>#<rank> <player_name></green>"
     lore:
-      - "<white>Balance: <gold>{balance}</gold></white>"
+      - "<white>Balance: <gold><balance></gold>"
   # Slots 0-44 are for player entries
   previous-page:
     slot: 45
     material: ARROW
     name: "<gray>Previous Page</gray>"
     lore:
-      - "<white>Page {page}/{max_page}</white>"
+      - "<white>Page <page>/<max_page></white>"
   page-info:
     slot: 49
     material: BOOK
-    name: "<white>Page {page}/{max_page}</white>"
+    name: "<white>Page <page>/<max_page></white>"
   next-page:
     slot: 53
     material: ARROW
     name: "<gray>Next Page</gray>"
     lore:
-      - "<white>Page {page}/{max_page}</white>"
+      - "<white>Page <page>/<max_page></white>"
