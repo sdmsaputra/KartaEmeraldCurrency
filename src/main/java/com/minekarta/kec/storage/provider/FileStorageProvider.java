@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -41,7 +42,11 @@ public class FileStorageProvider implements StorageProvider {
         options.setPrettyFlow(true);
         Representer representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
-        this.yaml = new Yaml(new Constructor(PlayerData.class, new org.yaml.snakeyaml.LoaderOptions()), representer, options);
+
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setTagInspector(tag -> tag.getClassName().equals(PlayerData.class.getName()));
+
+        this.yaml = new Yaml(new Constructor(PlayerData.class, loaderOptions), representer, options);
     }
 
     @Override
